@@ -1,0 +1,19 @@
+# 비밀 정보 / 환경 변수
+.env
+.env.*
+*.key
+*.pem
+secrets*
+
+# 학생 데이터 (백업 파일, 명단 파일은 올리지 않음)
+*.json
+*.csv
+*.xlsx
+*.xls
+
+# 운영체제 / 편집기
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.claude/

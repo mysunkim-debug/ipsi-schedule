@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리반 입시 일정</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --line: #e2e5ea;
+    --primary: #2f6fed;
+    --primary-dark: #2258c4;
+    --danger: #d64545;
+    --soon-bg: #fff4e0;
+    --soon-line: #f0a020;
+    --today-bg: #ffe3e3;
+    --today-line: #d64545;
+    --common: #2f8f5b;
+    --student: #7a4fd6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 28px; }
+  header .today { color: var(--muted); font-size: 17px; margin-left: 12px; font-weight: normal; }
+  .header-actions { display: flex; gap: 8px; }
+  main {
+    max-width: 1280px;
+    margin: 24px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+  }
+  .card h2 { margin: 0 0 14px; font-size: 22px; }
+  label { display: block; font-weight: bold; margin: 12px 0 6px; font-size: 17px; }
+  input, select, button { font: inherit; }
+  input[type="text"], input[type="date"], select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #c9ced6;
+    border-radius: 8px;
+    background: #fff;
+  }
+  input:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #c9ced6;
+    background: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button:hover { background: #f0f2f5; }
+  button.primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: bold; }
+  button.primary:hover { background: var(--primary-dark); }
+  button.small { padding: 4px 10px; font-size: 15px; }
+  button.danger { color: var(--danger); }
+  .row { display: flex; gap: 8px; }
+  .row input { flex: 1; }
+  .form-buttons { display: flex; gap: 8px; margin-top: 18px; }
+  .form-buttons .primary { flex: 1; }
+
+  .upload-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .upload-row #rosterBtn { flex: 1; }
+  .link-btn { border: none; background: none; color: var(--primary); text-decoration: underline; padding: 10px 6px; }
+  .link-btn:hover { background: none; color: var(--primary-dark); }
+  .upload-hint { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  #studentList { list-style: none; margin: 14px 0 0; padding: 0; }
+  #studentList li {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 4px; border-bottom: 1px solid var(--line);
+  }
+  #studentList li:last-child { border-bottom: none; }
+  .empty { color: var(--muted); padding: 12px 4px; }
+
+  .list-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .list-top h2 { margin: 0; }
+  .list-top select { width: auto; min-width: 220px; }
+
+  #eventList { list-style: none; margin: 0; padding: 0; }
+  .event {
+    display: grid;
+    grid-template-columns: 96px 130px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .event.soon { background: var(--soon-bg); border-left-color: var(--soon-line); }
+  .event.today { background: var(--today-bg); border-left-color: var(--today-line); }
+  .event.past { opacity: 0.45; }
+  .event.editing { outline: 3px solid var(--primary); }
+  .dday { font-size: 22px; font-weight: bold; text-align: center; }
+  .event.today .dday { color: var(--today-line); }
+  .event.soon .dday { color: #b36b00; }
+  .date { color: var(--muted); font-size: 17px; }
+  .title { font-size: 19px; font-weight: bold; }
+  .tag {
+    display: inline-block; margin-left: 8px; padding: 1px 10px;
+    border-radius: 999px; font-size: 15px; font-weight: normal; color: #fff;
+    vertical-align: middle;
+  }
+  .tag.common { background: var(--common); }
+  .tag.student { background: var(--student); }
+  .event-actions { display: flex; gap: 6px; }
+  .section-label { margin: 20px 0 10px; color: var(--muted); font-size: 16px; font-weight: bold; }
+
+  .legend { display: flex; gap: 18px; color: var(--muted); font-size: 15px; margin-bottom: 14px; flex-wrap: wrap; }
+  .legend span::before {
+    content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 3px;
+    margin-right: 6px; vertical-align: -2px;
+  }
+  .legend .l-today::before { background: var(--today-bg); border: 2px solid var(--today-line); }
+  .legend .l-soon::before { background: var(--soon-bg); border: 2px solid var(--soon-line); }
+  .legend .l-past::before { background: #eee; border: 2px solid #ccc; }
+
+  /* ---------- 보기 전환 / 인쇄 버튼 ---------- */
+  .list-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .view-toggle { display: inline-flex; border: 1px solid #c9ced6; border-radius: 8px; overflow: hidden; }
+  .view-toggle button { border: none; border-radius: 0; }
+  .view-toggle button + button { border-left: 1px solid #c9ced6; }
+  .view-toggle button.active { background: var(--primary); color: #fff; font-weight: bold; }
+  .print-title { display: none; }
+
+  /* ---------- 달력 ---------- */
+  .cal-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .cal-nav h3 { margin: 0 8px; font-size: 22px; min-width: 150px; text-align: center; }
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  .cal-head {
+    text-align: center; font-weight: bold; padding: 6px 0; font-size: 16px;
+    background: #f0f2f5; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .cal-head.sun, .cal-day.sun .num { color: var(--danger); }
+  .cal-head.sat, .cal-day.sat .num { color: var(--primary); }
+  .cal-day {
+    min-height: 110px; padding: 4px 5px 6px;
+    border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    cursor: pointer; overflow: hidden;
+  }
+  .cal-day:hover { background: #f7f9fc; }
+  .cal-day.other { background: #fafbfc; }
+  .cal-day.other .num { opacity: 0.35; }
+  .cal-day.today { background: #eef4ff; box-shadow: inset 0 0 0 2px var(--primary); }
+  .cal-day .num { font-size: 16px; font-weight: bold; margin-bottom: 3px; }
+  .cal-event {
+    display: block; width: 100%; text-align: left;
+    font-size: 14px; line-height: 1.35; padding: 2px 6px; margin-top: 3px;
+    border-radius: 5px; border: none; color: #fff;
+    white-space: normal; word-break: keep-all; overflow-wrap: anywhere;
+  }
+  .cal-event.common { background: var(--common); }
+  .cal-event.student { background: var(--student); }
+  .cal-event:hover { filter: brightness(1.1); background-image: none; }
+  .cal-event.common:hover { background: var(--common); }
+  .cal-event.student:hover { background: var(--student); }
+  .cal-day.past .cal-event { opacity: 0.5; }
+  .cal-hint { color: var(--muted); font-size: 15px; margin-top: 10px; }
+  .legend .l-common::before { background: var(--common); }
+  .legend .l-student::before { background: var(--student); }
+
+  /* ---------- 인쇄 ---------- */
+  @media print {
+    @page { size: A4 landscape; margin: 10mm; }
+    body { background: #fff; font-size: 12pt; }
+    header, main > section:first-child, .list-tools, .cal-nav button, .cal-hint,
+    .event-actions, #toast { display: none !important; }
+    main { display: block; max-width: none; margin: 0; padding: 0; }
+    .card { border: none; padding: 0; margin: 0; }
+    .list-top { display: none; }
+    .print-title { display: block; margin: 0 0 8px; font-size: 18pt; }
+    .cal-nav { display: none; }
+    .calendar { border-color: #999; }
+    .cal-head, .cal-day { border-color: #999 !important; }
+    .cal-day { min-height: 0; height: 30mm; break-inside: avoid; }
+    .cal-day.today { box-shadow: none; background: #fff; }
+    .cal-event, .tag, .event, .legend span::before {
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .cal-event { font-size: 9pt; padding: 1px 4px; }
+    .event { grid-template-columns: 80px 150px 1fr; break-inside: avoid; padding: 8px 12px; }
+    .event.past { opacity: 0.6; }
+  }
+
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #1f2430; color: #fff; padding: 12px 22px; border-radius: 10px;
+    opacity: 0; transition: opacity .25s; pointer-events: none; font-size: 17px;
+  }
+  #toast.show { opacity: 1; }
+
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 320px 1fr; }
+    .event { grid-template-columns: 84px 1fr auto; row-gap: 2px; }
+    .event .title { grid-column: 2; grid-row: 1; }
+    .event .date { grid-column: 2; grid-row: 2; }
+    .event .dday { grid-row: 1 / 3; }
+    .event .event-actions { grid-column: 3; grid-row: 1 / 3; }
+  }
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+    header { padding: 14px 16px; }
+    main { padding: 0 16px; }
+    .event { grid-template-columns: 80px 1fr auto; }
+    .event .date { grid-column: 2; grid-row: 2; }
+    .event .title { grid-column: 2; grid-row: 1; }
+    .event .dday { grid-row: 1 / 3; }
+    .event .event-actions { grid-column: 3; grid-row: 1 / 3; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>우리반 입시 일정 <span class="today" id="todayText"></span></h1>
+  <div class="header-actions">
+    <button id="exportBtn" type="button">내보내기(백업)</button>
+    <button id="importBtn" type="button">불러오기(복원)</button>
+    <input id="importFile" type="file" accept=".json,application/json" hidden>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="card">
+      <h2>학생 목록</h2>
+      <form id="studentForm" class="row">
+        <input id="studentName" type="text" placeholder="예: 6번 학생F" maxlength="20" required>
+        <button class="primary" type="submit">추가</button>
+      </form>
+      <div class="upload-row">
+        <button type="button" id="rosterBtn">명단 파일 올리기</button>
+        <button type="button" id="templateBtn" class="link-btn">양식 받기</button>
+        <input id="rosterFile" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
+      </div>
+      <p class="upload-hint">CSV·TXT 파일 (엑셀은 "CSV로 저장" 후 올리기)</p>
+      <ul id="studentList"></ul>
+    </div>
+
+    <div class="card">
+      <h2 id="formTitle">일정 추가</h2>
+      <form id="eventForm">
+        <label for="eventDate">날짜</label>
+        <input id="eventDate" type="date" required>
+        <label for="eventTitle">제목</label>
+        <input id="eventTitle" type="text" placeholder="예: 가나대 면접" maxlength="40" required>
+        <label for="eventTarget">대상</label>
+        <select id="eventTarget"></select>
+        <div class="form-buttons">
+          <button id="submitBtn" class="primary" type="submit">추가</button>
+          <button id="cancelEditBtn" type="button" hidden>취소</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="list-top">
+      <h2 id="viewTitle">일정 목록</h2>
+      <div class="list-tools">
+        <div class="view-toggle" role="group" aria-label="보기 방식">
+          <button type="button" id="listViewBtn" class="active">목록</button>
+          <button type="button" id="calViewBtn">달력</button>
+        </div>
+        <select id="filter" aria-label="일정 필터"></select>
+        <button type="button" id="printBtn">인쇄</button>
+      </div>
+    </div>
+    <h2 class="print-title" id="printTitle"></h2>
+
+    <div id="listView">
+      <div class="legend">
+        <span class="l-today">오늘</span>
+        <span class="l-soon">7일 이내</span>
+        <span class="l-past">지난 일정</span>
+      </div>
+      <ul id="eventList"></ul>
+    </div>
+
+    <div id="calView" hidden>
+      <div class="cal-nav">
+        <button type="button" id="prevMonth" aria-label="이전 달">◀</button>
+        <h3 id="calTitle"></h3>
+        <button type="button" id="nextMonth" aria-label="다음 달">▶</button>
+        <button type="button" id="thisMonth">이번 달</button>
+      </div>
+      <div class="legend">
+        <span class="l-common">반 공통</span>
+        <span class="l-student">학생 개별</span>
+      </div>
+      <div class="calendar" id="calendar"></div>
+      <p class="cal-hint">날짜 칸을 누르면 그 날짜로 일정 추가, 일정을 누르면 수정할 수 있습니다.</p>
+    </div>
+  </section>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const STORAGE_KEY = "classAdmissionSchedule.v1";
+  const COMMON = "common";
+
+  // ---------- 날짜 도우미 ----------
+  function todayStart() {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+  function toDateString(d) {
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+  function parseDate(str) {
+    const [y, m, d] = str.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  function daysFromToday(str) {
+    return Math.round((parseDate(str) - todayStart()) / 86400000);
+  }
+  function ddayLabel(diff) {
+    if (diff === 0) return "D-day";
+    return diff > 0 ? `D-${diff}` : `D+${-diff}`;
+  }
+  function formatDate(str) {
+    const d = parseDate(str);
+    const week = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+    return `${d.getMonth() + 1}월 ${d.getDate()}일 (${week})`;
+  }
+  function offsetDate(days) {
+    const d = todayStart();
+    d.setDate(d.getDate() + days);
+    return toDateString(d);
+  }
+  function newId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  // ---------- 가상 예시 데이터 (실제 학생 정보 아님) ----------
+  function sampleData() {
+    const students = [
+      { id: "s1", name: "1번 학생A" },
+      { id: "s2", name: "2번 학생B" },
+      { id: "s3", name: "3번 학생C" },
+      { id: "s4", name: "4번 학생D" },
+      { id: "s5", name: "5번 학생E" },
+    ];
+    const events = [
+      { id: "e1", date: offsetDate(0),  title: "가나대 자기소개서 마감(예시)", target: "s2" },
+      { id: "e2", date: offsetDate(2),  title: "다라대 면접(예시)", target: "s1" },
+      { id: "e3", date: offsetDate(5),  title: "마바대 서류 제출(예시)", target: "s3" },
+      { id: "e4", date: offsetDate(7),  title: "모의고사(예시)", target: COMMON },
+      { id: "e5", date: offsetDate(12), title: "사아대 실기고사(예시)", target: "s4" },
+      { id: "e6", date: offsetDate(20), title: "자차대 1단계 합격 발표(예시)", target: "s5" },
+      { id: "e7", date: offsetDate(45), title: "수능(예시 날짜)", target: COMMON },
+      { id: "e8", date: offsetDate(-3), title: "원서 접수 마감(예시)", target: COMMON },
+      { id: "e9", date: offsetDate(-6), title: "카타대 원서 접수(예시)", target: "s1" },
+    ];
+    return { students, events };
+  }
+
+  // ---------- 저장/불러오기 ----------
+  let state = loadState();
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (isValidData(data)) return data;
+      }
+    } catch (e) { /* 저장소를 쓸 수 없으면 예시 데이터로 시작 */ }
+    return sampleData();
+  }
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      showToast("브라우저에 저장하지 못했습니다. 내보내기로 백업해 주세요.");
+    }
+  }
+  function isValidData(data) {
+    return data && Array.isArray(data.students) && Array.isArray(data.events)
+      && data.students.every(s => typeof s.id === "string" && typeof s.name === "string")
+      && data.events.every(e => typeof e.id === "string" && typeof e.title === "string"
+        && typeof e.target === "string" && /^\d{4}-\d{2}-\d{2}$/.test(e.date));
+  }
+
+  // ---------- 화면 요소 ----------
+  const $ = id => document.getElementById(id);
+  const studentForm = $("studentForm"), studentName = $("studentName"), studentList = $("studentList");
+  const eventForm = $("eventForm"), eventDate = $("eventDate"), eventTitle = $("eventTitle"), eventTarget = $("eventTarget");
+  const submitBtn = $("submitBtn"), cancelEditBtn = $("cancelEditBtn"), formTitle = $("formTitle");
+  const filterSel = $("filter"), eventList = $("eventList");
+  let editingId = null;
+  let filterValue = "all";
+  const VIEW_KEY = "classAdmissionSchedule.view";
+  let viewMode = "list";
+  let calMonth = new Date(todayStart().getFullYear(), todayStart().getMonth(), 1);
+
+  function studentNameById(id) {
+    const s = state.students.find(s => s.id === id);
+    return s ? s.name : "(삭제된 학생)";
+  }
+
+  // ---------- 렌더링 ----------
+  function render() {
+    renderStudents();
+    renderTargetOptions();
+    renderFilterOptions();
+    renderEvents();
+  }
+
+  function renderStudents() {
+    studentList.innerHTML = "";
+    if (state.students.length === 0) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "등록된 학생이 없습니다.";
+      studentList.appendChild(li);
+      return;
+    }
+    state.students.forEach(s => {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      const count = state.events.filter(e => e.target === s.id).length;
+      name.textContent = `${s.name}  ·  일정 ${count}개`;
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "small danger";
+      del.textContent = "삭제";
+      del.addEventListener("click", () => deleteStudent(s.id));
+      li.append(name, del);
+      studentList.appendChild(li);
+    });
+  }
+
+  function renderTargetOptions() {
+    const current = eventTarget.value || COMMON;
+    eventTarget.innerHTML = "";
+    eventTarget.appendChild(new Option("반 공통", COMMON));
+    state.students.forEach(s => eventTarget.appendChild(new Option(s.name, s.id)));
+    eventTarget.value = [...eventTarget.options].some(o => o.value === current) ? current : COMMON;
+  }
+
+  function renderFilterOptions() {
+    filterSel.innerHTML = "";
+    filterSel.appendChild(new Option("전체 일정", "all"));
+    filterSel.appendChild(new Option("반 공통만", COMMON));
+    state.students.forEach(s => filterSel.appendChild(new Option(`${s.name} (+공통)`, s.id)));
+    if (![...filterSel.options].some(o => o.value === filterValue)) filterValue = "all";
+    filterSel.value = filterValue;
+  }
+
+  function visibleEvents() {
+    return state.events.filter(e => {
+      if (filterValue === "all") return true;
+      if (filterValue === COMMON) return e.target === COMMON;
+      return e.target === COMMON || e.target === filterValue;
+    });
+  }
+
+  function renderEvents() {
+    renderList();
+    renderCalendar();
+  }
+
+  function renderList() {
+    eventList.innerHTML = "";
+    const visible = visibleEvents();
+
+    const upcoming = visible.filter(e => daysFromToday(e.date) >= 0)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const past = visible.filter(e => daysFromToday(e.date) < 0)
+      .sort((a, b) => b.date.localeCompare(a.date));
+
+    if (visible.length === 0) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "표시할 일정이 없습니다. 왼쪽에서 일정을 추가해 보세요.";
+      eventList.appendChild(li);
+      return;
+    }
+    if (upcoming.length === 0) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "다가오는 일정이 없습니다.";
+      eventList.appendChild(li);
+    }
+    upcoming.forEach(e => eventList.appendChild(eventItem(e)));
+    if (past.length > 0) {
+      const label = document.createElement("li");
+      label.className = "section-label";
+      label.textContent = `지난 일정 (${past.length})`;
+      eventList.appendChild(label);
+      past.forEach(e => eventList.appendChild(eventItem(e)));
+    }
+  }
+
+  function eventItem(e) {
+    const diff = daysFromToday(e.date);
+    const li = document.createElement("li");
+    li.className = "event";
+    if (diff === 0) li.classList.add("today");
+    else if (diff > 0 && diff <= 7) li.classList.add("soon");
+    else if (diff < 0) li.classList.add("past");
+    if (e.id === editingId) li.classList.add("editing");
+
+    const dday = document.createElement("div");
+    dday.className = "dday";
+    dday.textContent = ddayLabel(diff);
+
+    const date = document.createElement("div");
+    date.className = "date";
+    date.textContent = formatDate(e.date);
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.textContent = e.title;
+    const tag = document.createElement("span");
+    if (e.target === COMMON) {
+      tag.className = "tag common";
+      tag.textContent = "반 공통";
+    } else {
+      tag.className = "tag student";
+      tag.textContent = studentNameById(e.target);
+    }
+    title.appendChild(tag);
+
+    const actions = document.createElement("div");
+    actions.className = "event-actions";
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "small";
+    edit.textContent = "수정";
+    edit.addEventListener("click", () => startEdit(e.id));
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "small danger";
+    del.textContent = "삭제";
+    del.addEventListener("click", () => deleteEvent(e.id));
+    actions.append(edit, del);
+
+    li.append(dday, date, title, actions);
+    return li;
+  }
+
+  // ---------- 달력 ----------
+  function renderCalendar() {
+    const cal = $("calendar");
+    cal.innerHTML = "";
+    const y = calMonth.getFullYear(), m = calMonth.getMonth();
+    $("calTitle").textContent = `${y}년 ${m + 1}월`;
+
+    ["일", "월", "화", "수", "목", "금", "토"].forEach((w, i) => {
+      const h = document.createElement("div");
+      h.className = "cal-head" + (i === 0 ? " sun" : i === 6 ? " sat" : "");
+      h.textContent = w;
+      cal.appendChild(h);
+    });
+
+    // 날짜별로 일정 묶기 (공통 일정 먼저, 그다음 학생 이름 순)
+    const byDate = {};
+    visibleEvents().forEach(e => (byDate[e.date] = byDate[e.date] || []).push(e));
+    Object.values(byDate).forEach(list => list.sort((a, b) =>
+      (a.target === COMMON ? 0 : 1) - (b.target === COMMON ? 0 : 1)
+      || studentNameById(a.target).localeCompare(studentNameById(b.target))));
+
+    // 달력 첫 칸 = 이번 달 1일이 속한 주의 일요일, 필요한 주 수만큼 채우기
+    const first = new Date(y, m, 1);
+    const start = new Date(y, m, 1 - first.getDay());
+    const weeks = Math.ceil((first.getDay() + new Date(y, m + 1, 0).getDate()) / 7);
+    const today = toDateString(todayStart());
+
+    for (let i = 0; i < weeks * 7; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const ds = toDateString(d);
+      const cell = document.createElement("div");
+      cell.className = "cal-day";
+      if (d.getMonth() !== m) cell.classList.add("other");
+      if (d.getDay() === 0) cell.classList.add("sun");
+      if (d.getDay() === 6) cell.classList.add("sat");
+      if (ds === today) cell.classList.add("today");
+      else if (ds < today) cell.classList.add("past");
+      cell.title = `${formatDate(ds)} 일정 추가`;
+      cell.addEventListener("click", () => {
+        resetForm();
+        eventDate.value = ds;
+        renderEvents();
+        eventTitle.focus();
+        showToast(`${formatDate(ds)} 일정을 입력하세요.`);
+      });
+
+      const num = document.createElement("div");
+      num.className = "num";
+      num.textContent = d.getDate();
+      cell.appendChild(num);
+
+      (byDate[ds] || []).forEach(e => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "cal-event " + (e.target === COMMON ? "common" : "student");
+        b.textContent = e.target === COMMON ? e.title : `${studentNameById(e.target)} · ${e.title}`;
+        b.title = "눌러서 수정";
+        b.addEventListener("click", ev => { ev.stopPropagation(); startEdit(e.id); });
+        cell.appendChild(b);
+      });
+      cal.appendChild(cell);
+    }
+  }
+
+  function setView(mode) {
+    viewMode = mode;
+    $("listView").hidden = mode !== "list";
+    $("calView").hidden = mode !== "calendar";
+    $("listViewBtn").classList.toggle("active", mode === "list");
+    $("calViewBtn").classList.toggle("active", mode === "calendar");
+    $("viewTitle").textContent = mode === "list" ? "일정 목록" : "일정 달력";
+    try { localStorage.setItem(VIEW_KEY, mode); } catch (e) { /* 무시 */ }
+  }
+
+  $("listViewBtn").addEventListener("click", () => setView("list"));
+  $("calViewBtn").addEventListener("click", () => setView("calendar"));
+  $("prevMonth").addEventListener("click", () => {
+    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  $("nextMonth").addEventListener("click", () => {
+    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+  $("thisMonth").addEventListener("click", () => {
+    calMonth = new Date(todayStart().getFullYear(), todayStart().getMonth(), 1);
+    renderCalendar();
+  });
+
+  // ---------- 인쇄 ----------
+  $("printBtn").addEventListener("click", () => {
+    const filterText = filterSel.options[filterSel.selectedIndex].text;
+    const what = viewMode === "calendar"
+      ? `${calMonth.getFullYear()}년 ${calMonth.getMonth() + 1}월 입시 일정`
+      : "입시 일정 목록";
+    $("printTitle").textContent = `${what} · ${filterText}  (출력일 ${toDateString(todayStart())})`;
+    window.print();
+  });
+
+  // ---------- 학생 ----------
+  studentForm.addEventListener("submit", ev => {
+    ev.preventDefault();
+    const name = studentName.value.trim();
+    if (!name) return;
+    if (state.students.some(s => s.name === name)) {
+      showToast("같은 이름의 학생이 이미 있습니다.");
+      return;
+    }
+    state.students.push({ id: newId(), name });
+    studentName.value = "";
+    saveState();
+    render();
+    showToast(`${name} 학생을 추가했습니다.`);
+  });
+
+  // ---------- 명단 파일 올리기 ----------
+  // 지원 형식: 한 줄에 한 명. "이름" / "번호,이름" / 머리글(번호·이름) 있는 CSV·TSV
+  function decodeText(buffer) {
+    try {
+      return new TextDecoder("utf-8", { fatal: true }).decode(buffer).replace(/^﻿/, "");
+    } catch (e) {
+      return new TextDecoder("euc-kr").decode(buffer); // 한글 엑셀에서 저장한 CSV
+    }
+  }
+
+  function splitLine(line) {
+    return line.split(/[,\t]/).map(c => c.trim().replace(/^"(.*)"$/, "$1").trim());
+  }
+
+  function parseRoster(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !/^[,\t\s]*$/.test(l));
+    if (lines.length === 0) return [];
+    let numCol = -1, nameCol = -1, start = 0;
+    const head = splitLine(lines[0]);
+    if (head.some(c => /이름|성명/.test(c))) {
+      nameCol = head.findIndex(c => /이름|성명/.test(c));
+      numCol = head.findIndex(c => /번호/.test(c));
+      start = 1;
+    }
+    const names = [];
+    for (let i = start; i < lines.length; i++) {
+      const cells = splitLine(lines[i]);
+      let num = "", name = "";
+      if (nameCol >= 0) {
+        name = cells[nameCol] || "";
+        num = numCol >= 0 ? (cells[numCol] || "") : "";
+      } else {
+        const filled = cells.filter(c => c);
+        if (filled.length >= 2 && /^\d+\s*번?$/.test(filled[0])) { num = filled[0]; name = filled[1]; }
+        else name = filled[0] || "";
+      }
+      num = num.replace(/\s*번$/, "");
+      if (!name && !num) continue;
+      let full = name;
+      if (num && /^\d+$/.test(num) && !/^\d+\s*번/.test(name)) full = `${num}번 ${name}`.trim();
+      names.push(full.slice(0, 20));
+    }
+    return names;
+  }
+
+  $("rosterBtn").addEventListener("click", () => $("rosterFile").click());
+
+  $("rosterFile").addEventListener("change", ev => {
+    const file = ev.target.files[0];
+    ev.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const names = parseRoster(decodeText(reader.result));
+      if (names.length === 0) {
+        alert("파일에서 학생 이름을 찾지 못했습니다.\n한 줄에 한 명씩, 또는 '번호,이름' 형식인지 확인해 주세요.");
+        return;
+      }
+      const existing = new Set(state.students.map(s => s.name));
+      const toAdd = [...new Set(names)].filter(n => !existing.has(n));
+      const skipped = names.length - toAdd.length;
+      if (toAdd.length === 0) {
+        alert(`파일의 ${names.length}명이 모두 이미 등록되어 있습니다.`);
+        return;
+      }
+      const preview = toAdd.slice(0, 10).join(", ") + (toAdd.length > 10 ? ` 외 ${toAdd.length - 10}명` : "");
+      const msg = `학생 ${toAdd.length}명을 추가할까요?` +
+        (skipped ? `\n(이미 있거나 중복된 ${skipped}명은 제외)` : "") + `\n\n${preview}`;
+      if (!confirm(msg)) return;
+      toAdd.forEach(name => state.students.push({ id: newId(), name }));
+      saveState();
+      render();
+      showToast(`학생 ${toAdd.length}명을 추가했습니다.`);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  $("templateBtn").addEventListener("click", () => {
+    const sample = "번호,이름\r\n1,학생A\r\n2,학생B\r\n3,학생C\r\n";
+    const blob = new Blob(["﻿" + sample], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "학생명단_양식.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  function deleteStudent(id) {
+    const name = studentNameById(id);
+    const count = state.events.filter(e => e.target === id).length;
+    const msg = count > 0
+      ? `${name} 학생과 이 학생의 일정 ${count}개를 삭제할까요?`
+      : `${name} 학생을 삭제할까요?`;
+    if (!confirm(msg)) return;
+    state.students = state.students.filter(s => s.id !== id);
+    state.events = state.events.filter(e => e.target !== id);
+    if (editingId && !state.events.some(e => e.id === editingId)) resetForm();
+    saveState();
+    render();
+  }
+
+  // ---------- 일정 ----------
+  eventForm.addEventListener("submit", ev => {
+    ev.preventDefault();
+    const data = {
+      date: eventDate.value,
+      title: eventTitle.value.trim(),
+      target: eventTarget.value,
+    };
+    if (!data.date || !data.title) return;
+    if (editingId) {
+      const e = state.events.find(e => e.id === editingId);
+      if (e) Object.assign(e, data);
+      showToast("일정을 수정했습니다.");
+    } else {
+      state.events.push({ id: newId(), ...data });
+      showToast("일정을 추가했습니다.");
+    }
+    saveState();
+    resetForm();
+    render();
+  });
+
+  function startEdit(id) {
+    const e = state.events.find(e => e.id === id);
+    if (!e) return;
+    editingId = id;
+    eventDate.value = e.date;
+    eventTitle.value = e.title;
+    eventTarget.value = e.target;
+    formTitle.textContent = "일정 수정";
+    submitBtn.textContent = "수정 저장";
+    cancelEditBtn.hidden = false;
+    renderEvents();
+    eventTitle.focus();
+  }
+
+  function resetForm() {
+    editingId = null;
+    eventTitle.value = "";
+    eventDate.value = toDateString(todayStart());
+    formTitle.textContent = "일정 추가";
+    submitBtn.textContent = "추가";
+    cancelEditBtn.hidden = true;
+  }
+
+  cancelEditBtn.addEventListener("click", () => { resetForm(); renderEvents(); });
+
+  function deleteEvent(id) {
+    const e = state.events.find(e => e.id === id);
+    if (!e || !confirm(`"${e.title}" 일정을 삭제할까요?`)) return;
+    state.events = state.events.filter(x => x.id !== id);
+    if (editingId === id) resetForm();
+    saveState();
+    render();
+  }
+
+  filterSel.addEventListener("change", () => {
+    filterValue = filterSel.value;
+    renderEvents();
+  });
+
+  // ---------- 백업 / 복원 ----------
+  $("exportBtn").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `입시일정_백업_${toDateString(todayStart())}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    showToast("백업 파일을 저장했습니다.");
+  });
+
+  $("importBtn").addEventListener("click", () => $("importFile").click());
+
+  $("importFile").addEventListener("change", ev => {
+    const file = ev.target.files[0];
+    ev.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try { data = JSON.parse(reader.result); } catch (e) { data = null; }
+      if (!isValidData(data)) {
+        alert("올바른 백업 파일이 아닙니다.");
+        return;
+      }
+      if (!confirm(`학생 ${data.students.length}명, 일정 ${data.events.length}개를 불러옵니다.\n지금 데이터는 모두 바뀝니다. 계속할까요?`)) return;
+      state = { students: data.students, events: data.events };
+      filterValue = "all";
+      resetForm();
+      saveState();
+      render();
+      showToast("백업 파일을 불러왔습니다.");
+    };
+    reader.readAsText(file, "utf-8");
+  });
+
+  // ---------- 알림 메시지 ----------
+  let toastTimer;
+  function showToast(msg) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  // ---------- 시작 ----------
+  $("todayText").textContent = `오늘 ${formatDate(toDateString(todayStart()))}`;
+  resetForm();
+  saveState();
+  render();
+  let savedView = "list";
+  try { savedView = localStorage.getItem(VIEW_KEY) || "list"; } catch (e) { /* 무시 */ }
+  setView(savedView === "calendar" ? "calendar" : "list");
+</script>
+</body>
+</html>
