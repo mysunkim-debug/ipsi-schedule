@@ -83,6 +83,12 @@
   }
   .search-wrap { position: relative; }
   .search-wrap input { font-size: 19px; padding: 12px 14px 12px 44px; }
+  .search-row { display: flex; gap: 8px; align-items: stretch; }
+  .search-row .search-wrap { flex: 1; min-width: 0; }
+  .fold-btn { font-size: 15px; padding: 0 12px; color: var(--muted); }
+  .fold-btn.has-filter { color: var(--primary-dark); border-color: var(--primary); background: var(--primary-soft); }
+  .toolbar.folded { padding: 10px 12px; }
+  .toolbar.folded #foldArea { display: none; }
   .search-wrap::before {
     content: "🔍"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: .6;
   }
@@ -197,6 +203,9 @@
   @media (max-width: 600px) {
     header { padding: 12px 16px; }
     header h1 { font-size: 22px; }
+    .header-actions button { padding: 6px 10px; font-size: 14px; }
+    .toolbar { padding: 12px; }
+    .search-wrap input { font-size: 17px; padding: 10px 12px 10px 40px; }
     .words { grid-template-columns: 1fr; }
     .grid2 { grid-template-columns: 1fr; }
   }
@@ -220,10 +229,14 @@
 </header>
 
 <main>
-  <section class="toolbar">
-    <div class="search-wrap">
-      <input type="search" id="q" placeholder="단어, 뜻, 유의어, 한자로 검색" autocomplete="off">
+  <section class="toolbar" id="toolbar">
+    <div class="search-row">
+      <div class="search-wrap">
+        <input type="search" id="q" placeholder="단어, 뜻, 유의어, 한자로 검색" autocomplete="off">
+      </div>
+      <button type="button" class="fold-btn" id="foldBtn" aria-controls="foldArea" aria-expanded="true">접기 ▲</button>
     </div>
+    <div id="foldArea">
     <p class="search-hint">초성으로도 찾을 수 있어요. 예: <b>ㅍㄹㅎㄷ</b> → 파리하다 · 밑줄 친 <b>한자</b>를 누르면 글자마다 음과 뜻이 보여요.</p>
     <div class="filters">
       <div class="chips" id="posChips"></div>
@@ -235,6 +248,7 @@
       <label class="toggle"><input type="checkbox" id="hideMeaning"> 뜻 가리기</label>
       <label class="toggle"><input type="checkbox" id="starOnly"> ★ 헷갈리는 단어만</label>
       <label class="toggle"><input type="checkbox" id="blankOnly"> 뜻 미입력만</label>
+    </div>
     </div>
   </section>
 
@@ -802,6 +816,36 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('show'), 1800);
 }
 
+// ---------- 위쪽 검색·필터 접기 ----------
+const FOLD_KEY = 'vocab-note-fold';
+let folded = (() => {
+  try {
+    const v = localStorage.getItem(FOLD_KEY);
+    if (v !== null) return v === '1';
+  } catch (e) { /* 무시 */ }
+  return window.innerWidth < 600; // 휴대폰은 처음에 접어 둠
+})();
+function activeFilterCount() {
+  return [state.pos !== '전체', !!state.date, state.sort !== 'date', state.hide, state.starOnly, state.blankOnly]
+    .filter(Boolean).length;
+}
+function updateFold() {
+  const n = activeFilterCount();
+  $('toolbar').classList.toggle('folded', folded);
+  $('foldBtn').setAttribute('aria-expanded', String(!folded));
+  $('foldBtn').classList.toggle('has-filter', folded && n > 0);
+  $('foldBtn').textContent = folded ? (n ? `필터 ${n} ▼` : '필터 ▼') : '접기 ▲';
+  $('foldBtn').title = folded ? '품사·날짜·정렬 등 필터 펼치기' : '필터를 접어 단어를 더 많이 보기';
+}
+$('foldBtn').addEventListener('click', () => {
+  folded = !folded;
+  try { localStorage.setItem(FOLD_KEY, folded ? '1' : '0'); } catch (e) { /* 무시 */ }
+  updateFold();
+});
+$('toolbar').addEventListener('change', updateFold);
+$('posChips').addEventListener('click', updateFold);
+
+updateFold();
 refresh();
 if (newWordCount) toast(`새 단어 ${newWordCount}개가 추가됐어요.`);
 </script>
