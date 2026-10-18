@@ -157,6 +157,17 @@
   label small { font-weight: normal; color: var(--muted); }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
   textarea { resize: vertical; min-height: 70px; }
+  .lookup { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: var(--primary-soft); }
+  .lookup-title { font-weight: bold; font-size: 15px; }
+  .lookup-title small { font-weight: normal; color: var(--muted); margin-left: 4px; }
+  .lookup-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .lookup-links a {
+    padding: 5px 12px; border-radius: 999px; font-size: 14px; text-decoration: none;
+    background: #fff; border: 1px solid #c9d8f7; color: var(--primary-dark);
+  }
+  .lookup-links a:hover { background: var(--primary); color: #fff; }
+  .lookup.off .lookup-links a { pointer-events: none; opacity: .45; }
+  .lookup-hint { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
   .form-buttons { display: flex; gap: 8px; margin-top: 18px; }
   .form-buttons .primary { flex: 1; }
 
@@ -257,6 +268,16 @@
         <label for="fDate">공부한 날</label>
         <input type="date" id="fDate" required>
       </div>
+    </div>
+    <div class="lookup" id="lookup">
+      <div class="lookup-title">🔎 뜻 찾아보기 <small id="lookupWord">단어를 먼저 입력하세요</small></div>
+      <div class="lookup-links">
+        <a data-dict="std" target="_blank" rel="noopener">표준국어대사전</a>
+        <a data-dict="open" target="_blank" rel="noopener">우리말샘</a>
+        <a data-dict="naver" target="_blank" rel="noopener">네이버 국어사전</a>
+        <a data-dict="hanja" target="_blank" rel="noopener">한자사전</a>
+      </div>
+      <p class="lookup-hint">새 창에서 사전이 열려요. 뜻을 복사해 아래 칸에 붙여 넣으세요. 한자어라면 한자 칸도 채워 주세요.</p>
     </div>
     <label for="fMeaning">뜻 <small>(여러 뜻은 줄을 바꿔 적기)</small></label>
     <textarea id="fMeaning"></textarea>
@@ -593,9 +614,30 @@ function openEditor(w) {
   $('fSyn').value = w ? w.syn.join(', ') : '';
   $('fAnt').value = w ? w.ant.join(', ') : '';
   $('fNote').value = w ? w.note : '';
+  updateLookup();
   $('editDialog').showModal();
   (w && !w.meaning ? $('fMeaning') : $('fWord')).focus();
 }
+
+// 입력한 단어로 사전 검색 주소를 만듦 (‘~에 준하다’ → ‘준하다’)
+const DICT_URL = {
+  std: q => `https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=${q}`,
+  open: q => `https://opendict.korean.go.kr/search/searchResult?query=${q}`,
+  naver: q => `https://ko.dict.naver.com/#/search?query=${q}`,
+  hanja: q => `https://hanja.dict.naver.com/#/search?query=${q}`,
+};
+function updateLookup() {
+  const word = $('fWord').value.trim().replace(/^~\S*\s+/, '').replace(/^~/, '');
+  const hanja = $('fHanja').value.trim().split(/[\s/]/)[0];
+  $('lookup').classList.toggle('off', !word);
+  $('lookupWord').textContent = word ? `‘${word}’` : '단어를 먼저 입력하세요';
+  document.querySelectorAll('#lookup [data-dict]').forEach(a => {
+    const q = encodeURIComponent(a.dataset.dict === 'hanja' && hanja ? hanja : word);
+    a.href = word ? DICT_URL[a.dataset.dict](q) : '#';
+  });
+}
+$('fWord').addEventListener('input', updateLookup);
+$('fHanja').addEventListener('input', updateLookup);
 $('addBtn').addEventListener('click', () => openEditor(null));
 $('cancelBtn').addEventListener('click', () => $('editDialog').close());
 $('editForm').addEventListener('submit', e => {
