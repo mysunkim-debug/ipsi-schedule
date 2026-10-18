@@ -167,6 +167,22 @@
   }
   .toast.show { opacity: 1; }
 
+  /* 한자 풀이 */
+  .hj { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+  .hj:hover { color: var(--primary-dark); }
+  .hj-pop {
+    position: absolute; z-index: 20; display: none;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.15); padding: 8px 10px; min-width: 200px; max-width: 300px;
+  }
+  .hj-pop.show { display: block; }
+  .hj-row { display: flex; align-items: center; gap: 12px; padding: 4px 6px; border-radius: 6px; }
+  .hj-row.cur { background: var(--primary-soft); }
+  .hj-char { font-size: 32px; line-height: 1.2; width: 40px; text-align: center; font-family: "Batang", "바탕", "Noto Serif KR", serif; }
+  .hj-hun { font-size: 17px; }
+  .hj-hun b { font-size: 19px; }
+  .hj-hun a { font-size: 13px; color: var(--muted); }
+
   @media (max-width: 600px) {
     header { padding: 12px 16px; }
     header h1 { font-size: 22px; }
@@ -174,7 +190,7 @@
     .grid2 { grid-template-columns: 1fr; }
   }
   @media print {
-    header .header-actions, .toolbar, .word-foot, .star-btn { display: none !important; }
+    header .header-actions, .toolbar, .word-foot, .star-btn, .hj-pop { display: none !important; }
     body { background: #fff; }
     .word { break-inside: avoid; }
   }
@@ -197,7 +213,7 @@
     <div class="search-wrap">
       <input type="search" id="q" placeholder="단어, 뜻, 유의어, 한자로 검색" autocomplete="off">
     </div>
-    <p class="search-hint">초성으로도 찾을 수 있어요. 예: <b>ㅍㄹㅎㄷ</b> → 파리하다</p>
+    <p class="search-hint">초성으로도 찾을 수 있어요. 예: <b>ㅍㄹㅎㄷ</b> → 파리하다 · 밑줄 친 <b>한자</b>를 누르면 글자마다 음과 뜻이 보여요.</p>
     <div class="filters">
       <div class="chips" id="posChips"></div>
       <select id="dateFilter" aria-label="날짜 선택"></select>
@@ -264,6 +280,7 @@
 </dialog>
 
 <div class="toast" id="toast"></div>
+<div class="hj-pop" id="hjPop" role="dialog" aria-label="한자 풀이"></div>
 
 <script>
 const STORAGE_KEY = 'vocab-note-v1';
@@ -504,19 +521,19 @@ function card(w, q) {
     ? `<div class="meaning ${hidden ? 'hidden' : ''}" data-reveal="${w.id}">${highlight(w.meaning, q)}</div>`
     : `<div class="meaning empty">뜻을 아직 적지 않았어요</div>`;
   const rel = (label, items, cls) => items.length
-    ? `<div class="rel ${cls}"><b>${label}</b>${items.map(t => `<button data-search="${escapeHtml(t.replace(/\(.*\)/, ''))}" title="‘${escapeHtml(t)}’ 검색">${highlight(t, q)}</button>`).join('')}</div>`
+    ? `<div class="rel ${cls}"><b>${label}</b>${items.map(t => `<button data-search="${escapeHtml(t.replace(/\(.*\)/, ''))}" title="‘${escapeHtml(t)}’ 검색">${hanjaify(highlight(t, q))}</button>`).join('')}</div>`
     : '';
   return `
     <article class="word ${w.star ? 'star' : ''}">
       <div class="word-head">
         <span class="pos" style="background:${color}" title="${POS_NAME[w.pos] || w.pos}">${w.pos === '기타' ? '·' : w.pos}</span>
         <span class="word-title">${highlightWord(w, q)}</span>
-        ${w.hanja ? `<span class="hanja">(${highlight(w.hanja, q)})</span>` : ''}
+        ${w.hanja ? `<span class="hanja">(${hanjaify(highlight(w.hanja, q))})</span>` : ''}
         <button class="star-btn ${w.star ? 'on' : ''}" data-star="${w.id}" title="헷갈리는 단어로 표시">★</button>
       </div>
       ${meaning}
       ${hidden ? '' : rel('유의어', w.syn, '') + rel('반의어', w.ant, 'ant')}
-      ${w.note && !hidden ? `<div class="note">📝 ${highlight(w.note, q)}</div>` : ''}
+      ${w.note && !hidden ? `<div class="note">📝 ${hanjaify(highlight(w.note, q))}</div>` : ''}
       <div class="word-foot">
         <button class="small" data-edit="${w.id}">${w.meaning.trim() ? '수정' : '뜻 적기'}</button>
         <button class="small danger" data-del="${w.id}">삭제</button>
@@ -539,6 +556,7 @@ $('starOnly').addEventListener('change', e => { state.starOnly = e.target.checke
 $('blankOnly').addEventListener('change', e => { state.blankOnly = e.target.checked; render(); });
 
 $('list').addEventListener('click', e => {
+  if (e.target.closest('.hj')) return; // 한자 풀이는 아래에서 따로 처리
   const t = e.target.closest('[data-star],[data-edit],[data-del],[data-reveal],[data-search]');
   if (!t) return;
   if (t.dataset.star) {
@@ -624,10 +642,66 @@ $('importFile').addEventListener('change', async e => {
   } catch (err) { alert('어휘 노트 파일이 아니거나 내용이 손상되었어요.'); }
 });
 
+// ---------- 한자 풀이 ----------
+// 글자: 훈(뜻) 음
+const HANJA = Object.fromEntries(`
+至:이를 지|樂:즐길 락|逍:노닐 소|遙:멀 요|吟:읊을 음|詠:읊을 영|落:떨어질 락|紅:붉을 홍|
+功:공 공|名:이름 명|詩:시 시|書:글 서|假:거짓 가|裝:꾸밀 장|遊:놀 유|民:백성 민|閑:한가할 한|
+豪:호걸 호|宕:호탕할 탕|北:북녘 북|闕:대궐 궐|修:닦을 수|身:몸 신|準:준할 준|結:맺을 결|付:줄 부|
+臨:임할 림|時:때 시|變:변할 변|通:통할 통|傷:다칠 상|心:마음 심|漂:떠다닐 표|泊:머무를 박|
+飢:주릴 기|渴:목마를 갈|墓:무덤 묘|所:바 소|薄:엷을 박|命:목숨 명|美:아름다울 미|人:사람 인|
+私:사사 사|安:편안 안|存:있을 존|沈:잠길 침|澱:앙금 전|刷:인쇄할 쇄|新:새 신|決:결단할 결|
+然:그럴 연|太:클 태|后:왕후 후|生:날 생|小:작을 소|蘇:되살아날 소|自:스스로 자|若:같을 약|
+泰:클 태|糾:살필 규|察:살필 찰|泛:뜰 범|陞:오를 승|品:품계 품|懷:품을 회|抱:안을 포|
+無:없을 무|二:두 이|大:큰 대|喜:기쁠 희|驚:놀랄 경|失:잃을 실|色:빛 색|思:생각 사|索:찾을 색|死:죽을 사
+`.replace(/\n/g, '').split('|').map(s => s.split(':')));
+
+const HANJA_RUN = /[㐀-鿿豈-﫿]+/g;
+// 이어진 한자 묶음마다 누를 수 있게 감쌈 (태그 이름·속성에는 한자가 없으므로 안전)
+function hanjaify(html) {
+  return html.replace(HANJA_RUN, run =>
+    `<span class="hj" data-hj="${run}">${[...run].map((c, i) => `<span data-i="${i}">${c}</span>`).join('')}</span>`);
+}
+
+function showHanja(el, cur) {
+  const pop = $('hjPop');
+  pop.innerHTML = [...el.dataset.hj].map((c, i) => {
+    const info = HANJA[c];
+    const [hun, eum] = info ? [info.slice(0, info.lastIndexOf(' ')), info.slice(info.lastIndexOf(' ') + 1)] : [];
+    const link = `<a href="https://hanja.dict.naver.com/#/search?query=${encodeURIComponent(c)}" target="_blank" rel="noopener">사전</a>`;
+    return `<div class="hj-row ${i === cur ? 'cur' : ''}">
+      <span class="hj-char">${c}</span>
+      <span class="hj-hun">${info ? `${hun} <b>${eum}</b> ${link}` : `풀이 없음 ${link}`}</span>
+    </div>`;
+  }).join('');
+  pop.classList.add('show');
+  const r = el.getBoundingClientRect();
+  const w = pop.offsetWidth;
+  const left = Math.max(8, Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - w - 8));
+  pop.style.left = left + 'px';
+  pop.style.top = (r.bottom + window.scrollY + 6) + 'px';
+}
+function hideHanja() { $('hjPop').classList.remove('show'); }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('.hj');
+  if (el) {
+    e.preventDefault();
+    const i = e.target.dataset.i;
+    showHanja(el, i === undefined ? -1 : Number(i));
+  } else if (!e.target.closest('#hjPop')) {
+    hideHanja();
+  }
+});
+window.addEventListener('resize', hideHanja);
+
 // 단축키: / 를 누르면 검색창으로
 document.addEventListener('keydown', e => {
   if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
     e.preventDefault(); $('q').focus();
+  }
+  if (e.key === 'Escape' && $('hjPop').classList.contains('show')) {
+    hideHanja(); return;
   }
   if (e.key === 'Escape' && document.activeElement === $('q') && state.q) {
     $('q').value = state.q = ''; render();
