@@ -309,6 +309,8 @@ const POS_NAME = { '명': '명사', '동': '동사', '형': '형용사', '부': 
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 // 노트에 적힌 단어 (처음 열 때 들어가는 기본 자료)
+// 단어 번호(id)는 이 목록의 순서로 매기므로, 새 단어는 반드시 맨 아래에 이어 붙일 것
+// (화면에서는 날짜순으로 다시 정렬됨)
 const SEED = [
   // 7/22
   ['2026-07-22', '형', '애닯다', '', '애처롭고 쓸쓸하다.', '', '', '표준어는 ‘애달프다’'],
@@ -392,16 +394,46 @@ function seedWords() {
   }));
 }
 
+const SEEN_KEY = 'vocab-note-seen-v1';
+const FIRST_SEED_COUNT = 64; // 새 단어 자동 추가 기능 이전에 배포된 기본 단어 수 (w1~w64)
+let newWordCount = 0;
 let words = load();
 let state = { q: '', pos: '전체', date: '', sort: 'date', hide: false, starOnly: false, blankOnly: false };
 const revealed = new Set();
 
 function load() {
+  let result = null;
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(saved)) return fillBlanks(saved);
+    if (Array.isArray(saved)) result = addNewSeedWords(fillBlanks(saved));
   } catch (e) { /* 저장된 자료가 없거나 읽을 수 없음 */ }
-  return seedWords();
+  if (!result) result = seedWords();
+  markSeedSeen();
+  return result;
+}
+
+// 이 기기에서 이미 받은 기본 단어 번호. 한 번 받은 단어는 삭제해도 다시 넣지 않음.
+function getSeen() {
+  try {
+    const seen = JSON.parse(localStorage.getItem(SEEN_KEY));
+    if (Array.isArray(seen)) return new Set(seen);
+  } catch (e) { /* 처음이거나 읽을 수 없음 */ }
+  return new Set(Array.from({ length: FIRST_SEED_COUNT }, (_, i) => 'w' + (i + 1)));
+}
+function markSeedSeen() {
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify(seedWords().map(w => w.id))); } catch (e) { /* 무시 */ }
+}
+// 나중에 추가된 기본 단어를 저장된 단어장에 넣음
+function addNewSeedWords(saved) {
+  const seen = getSeen();
+  const have = new Set(saved.map(w => w.id));
+  const fresh = seedWords().filter(w => !seen.has(w.id) && !have.has(w.id));
+  newWordCount = fresh.length;
+  if (fresh.length) {
+    saved.push(...fresh);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch (e) { /* 무시 */ }
+  }
+  return saved;
 }
 // 노트를 잘못 읽었던 단어: 예전 이름 → 바른 이름
 const RENAMED = { '자자하다': '짜짜하다' };
@@ -771,6 +803,7 @@ function toast(msg) {
 }
 
 refresh();
+if (newWordCount) toast(`새 단어 ${newWordCount}개가 추가됐어요.`);
 </script>
 </body>
 </html>
