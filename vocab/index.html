@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>국어 어휘 노트</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --line: #e2e5ea;
+    --primary: #2f6fed;
+    --primary-dark: #2258c4;
+    --primary-soft: #eaf1ff;
+    --danger: #d64545;
+    --mark: #fff1a8;
+    --star: #f0a020;
+    --pos-명: #2f8f5b;
+    --pos-동: #2f6fed;
+    --pos-형: #c2410c;
+    --pos-부: #7a4fd6;
+    --pos-기타: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 26px; }
+  header h1 small { color: var(--muted); font-size: 16px; font-weight: normal; margin-left: 8px; }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  main { max-width: 1000px; margin: 20px auto 60px; padding: 0 16px; }
+
+  input, select, button, textarea { font: inherit; color: inherit; }
+  input[type="text"], input[type="search"], input[type="date"], select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #c9ced6;
+    border-radius: 8px;
+    background: #fff;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  button {
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid #c9ced6;
+    background: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button:hover { background: #f0f2f5; }
+  button.primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: bold; }
+  button.primary:hover { background: var(--primary-dark); }
+  button.small { padding: 3px 10px; font-size: 14px; }
+  button.danger { color: var(--danger); }
+
+  /* 검색·필터 */
+  .toolbar {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  }
+  .search-wrap { position: relative; }
+  .search-wrap input { font-size: 19px; padding: 12px 14px 12px 44px; }
+  .search-wrap::before {
+    content: "🔍"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: .6;
+  }
+  .search-hint { color: var(--muted); font-size: 14px; margin: 6px 2px 0; }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 5px 12px; border-radius: 999px; font-size: 15px;
+    border: 1px solid #c9ced6; background: #fff;
+  }
+  .chip.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .filters select { width: auto; padding: 6px 10px; font-size: 15px; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; cursor: pointer; user-select: none; }
+  .toggle input { width: 18px; height: 18px; }
+
+  .result-info { color: var(--muted); margin: 16px 4px 8px; font-size: 15px; }
+
+  /* 단어 목록 */
+  .day { margin-top: 18px; }
+  .day h2 {
+    font-size: 18px; margin: 0 0 8px 4px; display: flex; gap: 8px; align-items: baseline;
+  }
+  .day h2 span { color: var(--muted); font-weight: normal; font-size: 14px; }
+  .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .word {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .word.star { border-color: var(--star); box-shadow: inset 4px 0 0 var(--star); }
+  .word-head { display: flex; align-items: center; gap: 8px; }
+  .pos {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: bold; color: #fff;
+  }
+  .word-title { font-size: 21px; font-weight: bold; }
+  .hanja { color: var(--muted); font-size: 16px; }
+  .star-btn { margin-left: auto; border: none; background: none; font-size: 20px; padding: 0 4px; color: #c9ced6; }
+  .star-btn.on { color: var(--star); }
+  .star-btn:hover { background: none; }
+  .meaning { white-space: pre-line; }
+  .meaning.empty { color: var(--muted); font-style: italic; }
+  .meaning.hidden {
+    background: #eef0f3; color: transparent; border-radius: 6px; cursor: pointer; user-select: none;
+    position: relative; min-height: 1.55em;
+  }
+  .meaning.hidden::after {
+    content: "눌러서 뜻 보기"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 14px;
+  }
+  .rel { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 14px; }
+  .rel b { color: var(--muted); font-weight: normal; margin-right: 2px; }
+  .rel button { padding: 1px 8px; font-size: 14px; border-radius: 999px; background: var(--primary-soft); border-color: transparent; color: var(--primary-dark); }
+  .rel.ant button { background: #fdecec; color: var(--danger); }
+  .note { color: var(--muted); font-size: 14px; }
+  .word-foot { display: flex; gap: 6px; justify-content: flex-end; margin-top: 2px; }
+  mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1px; }
+  .empty-state { text-align: center; color: var(--muted); padding: 48px 12px; }
+
+  /* 입력 창 */
+  dialog {
+    border: none; border-radius: 14px; padding: 0; width: min(560px, calc(100vw - 32px));
+    box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  }
+  dialog::backdrop { background: rgba(20,24,32,.45); }
+  dialog form { padding: 20px 22px; }
+  dialog h2 { margin: 0 0 6px; font-size: 22px; }
+  label { display: block; font-weight: bold; margin: 12px 0 5px; font-size: 15px; }
+  label small { font-weight: normal; color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  textarea { resize: vertical; min-height: 70px; }
+  .form-buttons { display: flex; gap: 8px; margin-top: 18px; }
+  .form-buttons .primary { flex: 1; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: #1f2430; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 15px;
+    opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 600px) {
+    header { padding: 12px 16px; }
+    header h1 { font-size: 22px; }
+    .words { grid-template-columns: 1fr; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+  @media print {
+    header .header-actions, .toolbar, .word-foot, .star-btn { display: none !important; }
+    body { background: #fff; }
+    .word { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📒 국어 어휘 노트 <small id="totalCount"></small></h1>
+  <div class="header-actions">
+    <button class="primary" id="addBtn">＋ 단어 추가</button>
+    <button id="exportBtn" title="단어장을 파일로 저장합니다">내보내기</button>
+    <button id="importBtn" title="저장해 둔 파일에서 단어장을 불러옵니다">불러오기</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+</header>
+
+<main>
+  <section class="toolbar">
+    <div class="search-wrap">
+      <input type="search" id="q" placeholder="단어, 뜻, 유의어, 한자로 검색" autocomplete="off">
+    </div>
+    <p class="search-hint">초성으로도 찾을 수 있어요. 예: <b>ㅍㄹㅎㄷ</b> → 파리하다</p>
+    <div class="filters">
+      <div class="chips" id="posChips"></div>
+      <select id="dateFilter" aria-label="날짜 선택"></select>
+      <select id="sort" aria-label="정렬">
+        <option value="date">날짜순</option>
+        <option value="abc">가나다순</option>
+      </select>
+      <label class="toggle"><input type="checkbox" id="hideMeaning"> 뜻 가리기</label>
+      <label class="toggle"><input type="checkbox" id="starOnly"> ★ 헷갈리는 단어만</label>
+      <label class="toggle"><input type="checkbox" id="blankOnly"> 뜻 미입력만</label>
+    </div>
+  </section>
+
+  <p class="result-info" id="resultInfo"></p>
+  <div id="list"></div>
+</main>
+
+<dialog id="editDialog">
+  <form method="dialog" id="editForm">
+    <h2 id="dialogTitle">단어 추가</h2>
+    <div class="grid2">
+      <div>
+        <label for="fWord">단어</label>
+        <input type="text" id="fWord" required>
+      </div>
+      <div>
+        <label for="fHanja">한자 <small>(선택)</small></label>
+        <input type="text" id="fHanja" placeholder="예: 至樂">
+      </div>
+      <div>
+        <label for="fPos">품사</label>
+        <select id="fPos">
+          <option value="명">명사</option>
+          <option value="동">동사</option>
+          <option value="형">형용사</option>
+          <option value="부">부사</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+      <div>
+        <label for="fDate">공부한 날</label>
+        <input type="date" id="fDate" required>
+      </div>
+    </div>
+    <label for="fMeaning">뜻 <small>(여러 뜻은 줄을 바꿔 적기)</small></label>
+    <textarea id="fMeaning"></textarea>
+    <div class="grid2">
+      <div>
+        <label for="fSyn">유의어 <small>(쉼표로 구분)</small></label>
+        <input type="text" id="fSyn">
+      </div>
+      <div>
+        <label for="fAnt">반의어 <small>(쉼표로 구분)</small></label>
+        <input type="text" id="fAnt">
+      </div>
+    </div>
+    <label for="fNote">메모 <small>(선택)</small></label>
+    <input type="text" id="fNote">
+    <div class="form-buttons">
+      <button type="button" id="cancelBtn">취소</button>
+      <button type="submit" class="primary" id="saveBtn">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'vocab-note-v1';
+const POS_NAME = { '명': '명사', '동': '동사', '형': '형용사', '부': '부사', '기타': '기타' };
+const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+// 노트에 적힌 단어 (처음 열 때 들어가는 기본 자료)
+const SEED = [
+  // 7/22
+  ['2026-07-22', '형', '애닯다', '', '애처롭고 쓸쓸하다.', '', '', '표준어는 ‘애달프다’'],
+  ['2026-07-22', '명', '사립', '', '나뭇가지를 엮어서 만든 대문.', '사립문', '', ''],
+  ['2026-07-22', '형', '파리하다', '', '몸이 마르고 낯빛이나 살색이 핏기가 전혀 없다.', '수척하다, 핼쑥하다', '', ''],
+  ['2026-07-22', '형', '예사스럽다', '', '평범하여 대수롭지 않게 여길 만하다.', '평범하다, 자연스럽다', '', ''],
+  ['2026-07-22', '형', '은은하다', '', '겉으로 뚜렷하게 드러나지 않고 흐릿하다.\n소리가 들릴 듯 말 듯 하다.', '그윽하다', '', ''],
+  ['2026-07-22', '형', '남루하다', '', '(옷, 차림새가) 낡고 너저분하다.', '너절하다, 누추하다', '', ''],
+  ['2026-07-22', '형', '욕되다', '', '부끄럽고 치욕적이다.', '', '', ''],
+  ['2026-07-22', '동', '옹송그리다', '', '춥거나 두려워 몸을 궁상맞게 몹시 웅그리다.', '오므리다, 웅크리다', '', ''],
+  ['2026-07-22', '동', '문후하다', '', '웃어른의 안부를 묻다.', '문안드리다', '', ''],
+  ['2026-07-22', '부', '필경', '', '끝장에 가서는.', '결국, 끝내', '', ''],
+  // 7/24
+  ['2026-07-24', '명', '지락', '至樂', '더할 나위 없는 즐거움.', '', '', ''],
+  ['2026-07-24', '동', '소요음영하다', '逍遙吟詠', '자유롭게 이리저리 거닐며 나지막이 시를 읊조리다.', '', '', ''],
+  ['2026-07-24', '명', '낙홍', '落紅', '떨어진 꽃이나 단풍잎.', '', '', ''],
+  ['2026-07-24', '명', '경화', '', '물건이나 몸이 단단하게 굳어짐.\n주장, 의견, 태도가 강경해짐.', '', '연화(부드러워짐)', ''],
+  ['2026-07-24', '형', '청승맞다', '', '궁상스럽고 처량하여 보기에 몹시 언짢다.', '궁상맞다, 처량하다', '', ''],
+  ['2026-07-24', '형', '맹랑하다', '', '생각하던 바와 달리 허망하다.', '난처하다', '', ''],
+  ['2026-07-24', '동', '칭사하다', '', '고마움을 표하다.', '칭송하다', '', '칭찬하다'],
+  ['2026-07-24', '동', '후대하다', '', '아주 잘 대접하다.', '관대하다', '', ''],
+  ['2026-07-24', '명', '터럭', '', '사람이나 짐승의 몸에 난 길고 굵은 털.\n(비유) 아주 작거나 사소한 것.', '', '', ''],
+  ['2026-07-24', '형', '가당찮다', '', '도무지 사리에 맞지 않다.', '부당하다, 엉뚱하다', '', ''],
+  // 7/27
+  ['2026-07-27', '명', '공명', '功名', '공을 세워서 자기의 이름을 널리 알림.', '', '', ''],
+  ['2026-07-27', '명', '시서', '詩書', '시와 글씨를 아울러 이르는 말.', '', '', ''],
+  ['2026-07-27', '형', '명랑하다', '', '흐린 데 없이 밝고 환하다.\n유쾌하고 활발하다.', '명쾌하다, 발랄하다', '어둡다', ''],
+  ['2026-07-27', '동', '책망하다', '', '잘못을 꾸짖거나 나무라며 못마땅하게 여기다.', '꾸짖다, 꾸지람하다', '', ''],
+  ['2026-07-27', '명', '독지가', '', '도탑고(굳고) 친절한 마음을 가진 사람.', '', '', ''],
+  ['2026-07-27', '명', '후의', '', '남에게 두터이 인정을 베푸는 마음.', '선심, 선의', '', ''],
+  ['2026-07-27', '명', '가장', '假裝', '태도를 거짓으로 꾸밈.', '', '', ''],
+  ['2026-07-27', '명', '유민', '遊民', '직업 없이 놀며 지내는 사람.', '한민(閑民)', '', ''],
+  ['2026-07-27', '형', '호탕하다', '豪宕', '호기롭고 걸걸하다.', '시원스럽다', '', ''],
+  ['2026-07-27', '형', '영롱하다', '', '광채가 찬란하다.\n구슬 따위가 울리는 소리가 맑고 청량하다.', '쟁쟁하다, 찬란하다', '', ''],
+  ['2026-07-27', '명', '북궐', '北闕', '경복궁을 달리 이르던 말.', '', '', '임금님이 계신 궁궐 ♥'],
+  // 8/4
+  ['2026-08-04', '동', '지우다', '', '(책임이나 의무를) 맡기다.', '부과하다', '', '‘책임이나 의무를 지우다’로 쓰임'],
+  ['2026-08-04', '명', '겸양', '', '겸손한 태도로 남에게 양보하거나 사양함.', '양보, 겸사, 사양', '', ''],
+  ['2026-08-04', '동', '조응하다', '', '둘 이상의 사물이나 현상, 말과 글의 앞뒤가 서로 일치하게 대응하다.', '대응하다, 조화하다', '', ''],
+  ['2026-08-04', '명', '행락', '', '재미있게 놀고 즐겁게 지냄.', '', '', ''],
+  ['2026-08-04', '명', '수신', '修身', '악을 물리치고 선을 북돋아 마음과 행실을 바르게 닦아 수양함.', '수련, 수양', '', ''],
+  // 10/14 (뜻은 표준국어대사전을 참고해 채움)
+  ['2026-10-14', '동', '~에 준하다', '準', '어떤 본보기에 비추어 그대로 좇다.', '따르다, 견주다', '', '독서 · 예: 정규직에 준하는 대우'],
+  ['2026-10-14', '동', '결부되다', '結付', '일정한 사물이나 현상이 서로 연관되어 붙게 되다.', '연관되다, 연결되다', '', '독서'],
+  ['2026-10-14', '명', '임시변통', '臨時變通', '갑자기 터진 일을 우선 간단하게 둘러맞추어 처리함.', '임기응변, 미봉책', '', ''],
+  ['2026-10-14', '동', '상심하다', '傷心', '슬픔이나 걱정 따위로 속을 썩이다.', '낙심하다, 애태우다', '', ''],
+  ['2026-10-14', '형', '자자하다', '藉藉', '여러 사람의 입에 오르내려 떠들썩하다.', '파다하다', '', '예: 소문이 자자하다, 칭찬이 자자하다'],
+  ['2026-10-14', '형', '너절하다', '', '허름하고 지저분하다.\n하찮고 시시하다.', '남루하다, 지저분하다', '', ''],
+  // 10/15
+  ['2026-10-15', '동', '표박하다', '漂泊', '일정한 주거나 생업 없이 떠돌아다니며 지내다.\n풍랑을 만난 배가 물 위를 정처 없이 떠돌아다니다.', '유랑하다, 방랑하다', '', ''],
+  ['2026-10-15', '명', '기갈', '飢渴', '배고픔과 목마름을 아울러 이르는 말.', '굶주림, 기아', '', ''],
+  ['2026-10-15', '명', '묘소', '墓所', '‘산소(뫼가 있는 곳)’를 높여 이르는 말.', '산소, 묘지', '', ''],
+  ['2026-10-15', '형', '박명하다', '薄命', '복이 없고 팔자가 사납다.\n수명이 짧다.', '', '', '예: 미인박명(美人薄命)'],
+  ['2026-10-15', '형', '사사로운', '私私', '공적이 아닌 개인적인 범위나 관계의 성질이 있다.', '개인적이다', '공적이다', '기본형: 사사롭다'],
+  ['2026-10-15', '형', '안존하다', '安存', '아무런 탈 없이 평안히 지내다.\n성품이 얌전하고 조용하다.', '얌전하다, 평안하다', '', '걸음걸이가 안존하다'],
+  ['2026-10-15', '명', '침전', '沈澱', '액체 속에 섞인 작은 고체가 밑바닥에 가라앉음.\n(비유) 기분 따위가 가라앉음.', '', '', '노트 글씨가 흐려 ‘침전’으로 읽음 — 확인 필요'],
+  ['2026-10-15', '동', '부대끼다', '', '사람이나 일에 시달려 괴로움을 당하다.\n여러 사람과 만나거나 함께 지내면서 서로 접촉하다.', '시달리다', '', ''],
+  ['2026-10-15', '명', '쇄신', '刷新', '나쁜 폐단이나 묵은 것을 버리고 새롭게 함.', '혁신, 개혁', '', ''],
+  ['2026-10-15', '형', '결연한', '決然', '마음가짐이나 행동에 있어 태도가 움직일 수 없을 만큼 확고하다.', '단호하다, 확고하다', '', '결연한 의지 · 기본형: 결연하다'],
+  // 10/17
+  ['2026-10-17', '명', '태후', '太后', '황제의 살아 있는 어머니를 이르던 말.', '황태후', '', ''],
+  ['2026-10-17', '명', '소생', '所生 / 小生', '(所生) 자기가 낳은 아들이나 딸.\n(小生) 말하는 이가 윗사람에게 자기를 낮추어 이르는 말.', '', '', '고전 소설에서 두 뜻 모두 자주 나옴. 蘇生(되살아남)과 구별'],
+  ['2026-10-17', '형', '고이한', '', '정상적이지 않고 별나며 괴상하다.', '괴이하다, 이상하다', '', '‘괴이한’의 옛 표기 · 기본형: 고이하다'],
+  ['2026-10-17', '형', '자약한', '自若', '큰일을 당해서도 놀라지 않고 보통 때처럼 침착하다.', '태연하다, 침착하다', '', '예: 태연자약(泰然自若) · 기본형: 자약하다'],
+  ['2026-10-17', '동', '규찰하다', '糾察', '죄상을 자세히 캐어 밝히다.', '조사하다, 캐묻다', '', ''],
+  ['2026-10-17', '부', '범연히', '泛然', '차근차근한 맛이 없이 데면데면하게.\n두드러진 데가 없이 예사롭게.', '데면데면히, 예사로이', '', ''],
+  ['2026-10-17', '명', '승품', '陞品', '정삼품 이상의 품계에 오름.', '승진', '', ''],
+  ['2026-10-17', '명', '회포', '懷抱', '마음속에 품은 생각이나 정.', '심회, 소회', '', '예: 회포를 풀다'],
+  ['2026-10-17', '형', '무이하게', '無二', '오직 하나뿐이고 둘도 없다.', '유일하다', '', '기본형: 무이하다'],
+  ['2026-10-17', '명', '대희', '大喜', '크게 기뻐함.', '', '대경', ''],
+  ['2026-10-17', '명', '대경', '大驚', '크게 놀람.', '', '대희', '예: 대경실색(大驚失色)'],
+  ['2026-10-17', '동', '사색하다', '思索', '어떤 것에 대하여 깊이 생각하고 이치를 따지다.', '숙고하다, 사유하다', '', '死色(죽은 사람처럼 창백한 얼굴빛)과 구별'],
+];
+
+const splitList = s => (s || '').split(',').map(x => x.trim()).filter(Boolean);
+
+function seedWords() {
+  return SEED.map(([date, pos, word, hanja, meaning, syn, ant, note], i) => ({
+    id: 'w' + (i + 1), date, pos, word, hanja, meaning,
+    syn: splitList(syn), ant: splitList(ant), note, star: false,
+  }));
+}
+
+let words = load();
+let state = { q: '', pos: '전체', date: '', sort: 'date', hide: false, starOnly: false, blankOnly: false };
+const revealed = new Set();
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (Array.isArray(saved)) return fillBlanks(saved);
+  } catch (e) { /* 저장된 자료가 없거나 읽을 수 없음 */ }
+  return seedWords();
+}
+// 예전에 뜻 없이 저장된 기본 단어는 새 기본 자료의 뜻으로 채움 (직접 적은 뜻은 그대로 둠)
+function fillBlanks(saved) {
+  const seed = Object.fromEntries(seedWords().map(w => [w.id, w]));
+  saved.forEach(w => {
+    const s = seed[w.id];
+    if (!s || s.word !== w.word || (w.meaning || '').trim() || !s.meaning) return;
+    Object.assign(w, {
+      pos: s.pos, meaning: s.meaning,
+      hanja: w.hanja || s.hanja,
+      syn: (w.syn || []).length ? w.syn : s.syn,
+      ant: (w.ant || []).length ? w.ant : s.ant,
+      note: w.note && w.note !== s.note.split(' · ')[0] ? w.note : s.note,
+    });
+  });
+  return saved;
+}
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(words)); }
+  catch (e) { toast('브라우저에 저장하지 못했어요. 내보내기로 백업해 주세요.'); }
+}
+
+// ---------- 검색 ----------
+const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+function toChosung(str) {
+  let out = '';
+  for (const ch of str) {
+    const code = ch.charCodeAt(0) - 0xAC00;
+    out += (code >= 0 && code < 11172) ? CHO[Math.floor(code / 588)] : ch;
+  }
+  return out;
+}
+const isChosungOnly = s => /^[ㄱ-ㅎ\s]+$/.test(s);
+const norm = s => (s || '').toLowerCase().replace(/\s+/g, '');
+
+function matches(w, q) {
+  if (!q) return true;
+  const nq = norm(q);
+  if (isChosungOnly(q)) {
+    return [w.word, ...w.syn, ...w.ant].some(t => norm(toChosung(t)).includes(nq));
+  }
+  const hay = [w.word, w.hanja, w.meaning, w.note, ...w.syn, ...w.ant].map(norm).join('\n');
+  return hay.includes(nq);
+}
+
+// 검색어를 노란색으로 표시 (띄어쓰기 무시)
+function highlight(text, q) {
+  const safe = escapeHtml(text || '');
+  if (!q || isChosungOnly(q)) return safe;
+  const chars = [...norm(q)].map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  if (!chars.length) return safe;
+  try {
+    const re = new RegExp('(' + chars.join('\\s*') + ')', 'gi');
+    return safe.replace(re, '<mark>$1</mark>');
+  } catch (e) { return safe; }
+}
+function highlightWord(w, q) {
+  if (q && isChosungOnly(q)) {
+    // 초성 검색일 때는 단어 전체를 표시
+    return norm(toChosung(w.word)).includes(norm(q)) ? `<mark>${escapeHtml(w.word)}</mark>` : escapeHtml(w.word);
+  }
+  return highlight(w.word, q);
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ---------- 화면 그리기 ----------
+const $ = id => document.getElementById(id);
+
+function formatDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return `${dt.getMonth() + 1}/${dt.getDate()} (${DAYS[dt.getDay()]})`;
+}
+
+function renderFilters() {
+  const counts = {};
+  words.forEach(w => counts[w.pos] = (counts[w.pos] || 0) + 1);
+  const opts = ['전체', '명', '동', '형', '부', '기타'].filter(p => p === '전체' || counts[p]);
+  $('posChips').innerHTML = opts.map(p =>
+    `<button class="chip ${state.pos === p ? 'on' : ''}" data-pos="${p}">${p === '전체' ? '전체' : POS_NAME[p]}</button>`
+  ).join('');
+
+  const dates = [...new Set(words.map(w => w.date))].sort();
+  if (state.date && !dates.includes(state.date)) state.date = '';
+  $('dateFilter').innerHTML = `<option value="">모든 날짜</option>` +
+    dates.map(d => `<option value="${d}" ${d === state.date ? 'selected' : ''}>${formatDate(d)} · ${words.filter(w => w.date === d).length}개</option>`).join('');
+  $('totalCount').textContent = `단어 ${words.length}개`;
+}
+
+function render() {
+  const q = state.q.trim();
+  let list = words.filter(w =>
+    (state.pos === '전체' || w.pos === state.pos) &&
+    (!state.date || w.date === state.date) &&
+    (!state.starOnly || w.star) &&
+    (!state.blankOnly || !w.meaning.trim()) &&
+    matches(w, q)
+  );
+
+  const byWord = (a, b) => a.word.replace(/^~/, '').localeCompare(b.word.replace(/^~/, ''), 'ko');
+  list.sort(state.sort === 'abc' ? byWord : (a, b) => a.date.localeCompare(b.date) || 0);
+
+  const blank = words.filter(w => !w.meaning.trim()).length;
+  $('resultInfo').textContent = (q ? `‘${q}’ 검색 결과 ${list.length}개` : `${list.length}개 표시 중`) +
+    (blank ? ` · 뜻을 아직 적지 않은 단어 ${blank}개` : '');
+
+  if (!list.length) {
+    $('list').innerHTML = `<div class="empty-state">${q ? '찾는 단어가 없어요.<br>철자를 확인하거나 <b>＋ 단어 추가</b>로 새로 넣어 보세요.' : '조건에 맞는 단어가 없어요.'}</div>`;
+    return;
+  }
+
+  if (state.sort === 'abc') {
+    $('list').innerHTML = `<div class="words">${list.map(w => card(w, q)).join('')}</div>`;
+  } else {
+    const groups = {};
+    list.forEach(w => (groups[w.date] = groups[w.date] || []).push(w));
+    $('list').innerHTML = Object.keys(groups).sort().map(d => `
+      <section class="day">
+        <h2>${formatDate(d)} <span>${groups[d].length}개</span></h2>
+        <div class="words">${groups[d].map(w => card(w, q)).join('')}</div>
+      </section>`).join('');
+  }
+}
+
+function card(w, q) {
+  const color = `var(--pos-${w.pos in POS_NAME ? w.pos : '기타'})`;
+  const hidden = state.hide && !revealed.has(w.id) && w.meaning.trim();
+  const meaning = w.meaning.trim()
+    ? `<div class="meaning ${hidden ? 'hidden' : ''}" data-reveal="${w.id}">${highlight(w.meaning, q)}</div>`
+    : `<div class="meaning empty">뜻을 아직 적지 않았어요</div>`;
+  const rel = (label, items, cls) => items.length
+    ? `<div class="rel ${cls}"><b>${label}</b>${items.map(t => `<button data-search="${escapeHtml(t.replace(/\(.*\)/, ''))}" title="‘${escapeHtml(t)}’ 검색">${highlight(t, q)}</button>`).join('')}</div>`
+    : '';
+  return `
+    <article class="word ${w.star ? 'star' : ''}">
+      <div class="word-head">
+        <span class="pos" style="background:${color}" title="${POS_NAME[w.pos] || w.pos}">${w.pos === '기타' ? '·' : w.pos}</span>
+        <span class="word-title">${highlightWord(w, q)}</span>
+        ${w.hanja ? `<span class="hanja">(${highlight(w.hanja, q)})</span>` : ''}
+        <button class="star-btn ${w.star ? 'on' : ''}" data-star="${w.id}" title="헷갈리는 단어로 표시">★</button>
+      </div>
+      ${meaning}
+      ${hidden ? '' : rel('유의어', w.syn, '') + rel('반의어', w.ant, 'ant')}
+      ${w.note && !hidden ? `<div class="note">📝 ${highlight(w.note, q)}</div>` : ''}
+      <div class="word-foot">
+        <button class="small" data-edit="${w.id}">${w.meaning.trim() ? '수정' : '뜻 적기'}</button>
+        <button class="small danger" data-del="${w.id}">삭제</button>
+      </div>
+    </article>`;
+}
+
+function refresh() { renderFilters(); render(); }
+
+// ---------- 이벤트 ----------
+$('q').addEventListener('input', e => { state.q = e.target.value; render(); });
+$('posChips').addEventListener('click', e => {
+  const b = e.target.closest('[data-pos]'); if (!b) return;
+  state.pos = b.dataset.pos; refresh();
+});
+$('dateFilter').addEventListener('change', e => { state.date = e.target.value; render(); });
+$('sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
+$('hideMeaning').addEventListener('change', e => { state.hide = e.target.checked; revealed.clear(); render(); });
+$('starOnly').addEventListener('change', e => { state.starOnly = e.target.checked; render(); });
+$('blankOnly').addEventListener('change', e => { state.blankOnly = e.target.checked; render(); });
+
+$('list').addEventListener('click', e => {
+  const t = e.target.closest('[data-star],[data-edit],[data-del],[data-reveal],[data-search]');
+  if (!t) return;
+  if (t.dataset.star) {
+    const w = words.find(x => x.id === t.dataset.star); w.star = !w.star; save(); render();
+  } else if (t.dataset.edit) {
+    openEditor(words.find(x => x.id === t.dataset.edit));
+  } else if (t.dataset.del) {
+    const w = words.find(x => x.id === t.dataset.del);
+    if (confirm(`‘${w.word}’ 단어를 삭제할까요?`)) {
+      words = words.filter(x => x.id !== w.id); save(); refresh(); toast('삭제했어요.');
+    }
+  } else if (t.dataset.reveal && t.classList.contains('hidden')) {
+    revealed.add(t.dataset.reveal); render();
+  } else if (t.dataset.search) {
+    $('q').value = state.q = t.dataset.search; render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+// 단어 추가·수정
+let editingId = null;
+function openEditor(w) {
+  editingId = w ? w.id : null;
+  $('dialogTitle').textContent = w ? `‘${w.word}’ 수정` : '단어 추가';
+  $('fWord').value = w ? w.word : '';
+  $('fHanja').value = w ? w.hanja : '';
+  $('fPos').value = w ? w.pos : '명';
+  $('fDate').value = w ? w.date : today();
+  $('fMeaning').value = w ? w.meaning : '';
+  $('fSyn').value = w ? w.syn.join(', ') : '';
+  $('fAnt').value = w ? w.ant.join(', ') : '';
+  $('fNote').value = w ? w.note : '';
+  $('editDialog').showModal();
+  (w && !w.meaning ? $('fMeaning') : $('fWord')).focus();
+}
+$('addBtn').addEventListener('click', () => openEditor(null));
+$('cancelBtn').addEventListener('click', () => $('editDialog').close());
+$('editForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const data = {
+    word: $('fWord').value.trim(),
+    hanja: $('fHanja').value.trim(),
+    pos: $('fPos').value,
+    date: $('fDate').value,
+    meaning: $('fMeaning').value.trim(),
+    syn: splitList($('fSyn').value.replace(/、|，/g, ',')),
+    ant: splitList($('fAnt').value.replace(/、|，/g, ',')),
+    note: $('fNote').value.trim(),
+  };
+  if (!data.word || !data.date) return;
+  if (editingId) {
+    Object.assign(words.find(x => x.id === editingId), data);
+    toast('수정했어요.');
+  } else {
+    const dup = words.find(x => x.word === data.word);
+    if (dup && !confirm(`‘${data.word}’는 ${formatDate(dup.date)}에 이미 있어요. 그래도 추가할까요?`)) return;
+    words.push({ id: 'w' + Date.now(), star: false, ...data });
+    toast('추가했어요.');
+  }
+  save(); refresh(); $('editDialog').close();
+});
+
+// 내보내기·불러오기
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(words, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `어휘노트_${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+$('importBtn').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!Array.isArray(data) || !data.every(w => w && w.word && w.date)) throw new Error();
+    if (!confirm(`단어 ${data.length}개를 불러와 지금 단어장을 바꿀까요?`)) return;
+    words = data.map(w => ({ hanja: '', meaning: '', note: '', pos: '기타', star: false, ...w,
+      syn: Array.isArray(w.syn) ? w.syn : [], ant: Array.isArray(w.ant) ? w.ant : [] }));
+    save(); refresh(); toast('불러왔어요.');
+  } catch (err) { alert('어휘 노트 파일이 아니거나 내용이 손상되었어요.'); }
+});
+
+// 단축키: / 를 누르면 검색창으로
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+    e.preventDefault(); $('q').focus();
+  }
+  if (e.key === 'Escape' && document.activeElement === $('q') && state.q) {
+    $('q').value = state.q = ''; render();
+  }
+});
+
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+let toastTimer;
+function toast(msg) {
+  $('toast').textContent = msg; $('toast').classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('show'), 1800);
+}
+
+refresh();
+</script>
+</body>
+</html>
