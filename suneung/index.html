@@ -221,6 +221,9 @@
   .c-imp { display: inline-block; font-size: 13px; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 1px; }
   .c-pair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
   .c-pair .c-head { margin-bottom: 2px; }
+  .c-head-row { display: flex; align-items: center; flex-wrap: wrap; column-gap: 10px; margin-bottom: 8px; }
+  .c-head-row .c-head { margin-bottom: 0; }
+  .c-head-note { font-weight: bold; color: var(--text); }
   /* 비교 대상(지시어 아님)은 연하게 */
   .c-head-sub { background: transparent; color: color-mix(in srgb, var(--primary) 75%, var(--muted)); border: 1.5px dashed color-mix(in srgb, var(--primary) 45%, transparent); padding: 1.5px 9.5px; font-weight: 600; }
   .c-sub-label { color: var(--muted); }
@@ -358,8 +361,7 @@
         </div>
       </div>
       <div class="c-item">
-        <div class="c-head">한 번 언급된 명사 대신</div>
-        <div class="en">one(s), that(those) …</div>
+        <div class="c-head-row"><span class="c-head en">one(s), that(those)</span><span class="c-head-note">한 번 언급된 명사 대신</span></div>
         <div class="c-desc"><b class="en">one(s)</b>: 같은 종류의 다른 것 (a + 명사) / <b class="en">that(those)</b>: the + 앞 명사, 주로 <span class="en">that of ~</span> 형태로 비교할 때<br>
           <span class="c-paren">※ it은 '바로 그것', one은 '같은 종류의 아무거나 하나'</span></div>
         <div class="c-ex">
