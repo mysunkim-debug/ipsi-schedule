@@ -195,8 +195,17 @@
   .c-list li { margin: 3px 0; }
   .c-paren { color: var(--muted); font-size: 15px; }
   .c-key { font-weight: bold; background: linear-gradient(transparent 60%, color-mix(in srgb, var(--star) 35%, transparent) 60%); display: inline; }
-  .c-list li.c-key { display: list-item; background: none; }
-  .c-list li.c-key > .en { background: linear-gradient(transparent 60%, color-mix(in srgb, var(--star) 35%, transparent) 60%); }
+  .c-list > li { margin: 8px 0; }
+  .c-tip { background: var(--primary-soft); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 16px; }
+  .c-legend { margin-top: 6px; font-size: 14px; }
+  .c-desc { font-size: 15.5px; margin-top: 4px; }
+  .c-ex { border-left: 3px solid var(--line); padding: 4px 0 4px 10px; margin: 8px 0 4px; }
+  .c-ex::before { content: "예"; display: inline-block; font-size: 12px; font-weight: bold; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-bottom: 2px; }
+  .c-ex p { margin: 2px 0; }
+  .c-ex p.en { font-size: 16.5px; }
+  .c-ex p.ko { font-size: 14.5px; color: var(--muted); }
+  .pt { color: var(--primary); font-weight: bold; }
+  .ref { text-decoration: underline wavy color-mix(in srgb, var(--good) 70%, transparent); text-underline-offset: 4px; color: var(--good); }
   .c-imp { display: inline-block; font-size: 13px; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 1px; }
   .c-pair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
   .c-vs { color: var(--muted); font-size: 14px; }
@@ -277,27 +286,71 @@
   <!-- 개념 -->
   <section id="tab-concept" class="concept" hidden>
     <h2>1. 지시어</h2>
+    <div class="c-tip">
+      <b>💡 왜 중요할까?</b> 지시어는 앞에 나온 내용을 가리키므로, <b>바로 앞에 가리키는 대상이 있어야</b> 글이 자연스럽게 이어집니다.
+      순서 배열·문장 삽입 문제에서 지시어가 무엇을 가리키는지 찾으면 앞뒤 문장이 결정돼요.
+      <div class="c-legend"><b class="pt">가리키는 말</b> → <span class="ref">가리키는 대상</span></div>
+    </div>
 
     <div class="c-sec">
       <h3><span class="c-num">(1)</span> 대명사</h3>
       <div class="c-item">
         <div class="c-head en">it, he, she / they</div>
+        <div class="c-desc">앞에 나온 명사를 대신합니다. <b>단수·복수와 성별</b>을 맞춰 보면 무엇을 가리키는지 찾을 수 있어요.</div>
+        <div class="c-ex">
+          <p class="en"><span class="ref">Honeybees</span> share information through <span class="ref">a special dance</span>. <b class="pt">They</b> use <b class="pt">it</b> to tell others where food is.</p>
+          <p class="ko">꿀벌은 특별한 춤으로 정보를 나눈다. 꿀벌은 그 춤으로 먹이가 있는 곳을 알린다.</p>
+        </div>
         <div class="c-box">
           <div class="c-box-title">It이 주어로 쓰였을 때</div>
           <ol class="c-list">
-            <li>대명사 <span class="c-paren">(앞 문장 주어 가리킴)</span></li>
-            <li>가주어 / 진주어</li>
-            <li class="c-key"><span class="en">It ~ that</span> 강조구문 <span class="c-imp">중요한 문장!!!</span></li>
+            <li>대명사 <span class="c-paren">(앞 문장 주어 가리킴)</span>
+              <div class="c-ex">
+                <p class="en"><span class="ref">The experiment</span> failed. <b class="pt">It</b> was poorly designed.</p>
+                <p class="ko">그 실험은 실패했다. 그것(실험)은 설계가 허술했다.</p>
+              </div>
+            </li>
+            <li>가주어 / 진주어
+              <div class="c-desc">주어가 길 때 It을 앞에 두고, 진짜 주어(to부정사·that절)는 뒤로 보냅니다. 이때 It은 <b>아무것도 가리키지 않아요</b>.</div>
+              <div class="c-ex">
+                <p class="en"><b>It</b> is important <u>to get enough sleep before an exam</u>.</p>
+                <p class="ko">시험 전에 충분히 자는 것이 중요하다. (It = 가주어, 밑줄 = 진주어)</p>
+              </div>
+            </li>
+            <li><span class="c-key"><span class="en">It ~ that</span> 강조구문</span> <span class="c-imp">중요한 문장!!!</span>
+              <div class="c-desc">It is/was와 that 사이에 강조하고 싶은 말을 넣습니다. 필자가 힘주어 말하는 부분이라 <b>주제문·요지의 단서</b>가 돼요.<br>
+                구별법: <b>It is/was와 that을 지워도 완전한 문장</b>이 남으면 강조구문, 안 되면 가주어 구문.</div>
+              <div class="c-ex">
+                <p class="en"><b>It was</b> <span class="c-key">trust, not talent,</span> <b>that</b> held the team together.</p>
+                <p class="ko">팀을 하나로 묶은 것은 재능이 아니라 바로 <b>신뢰</b>였다.<br>
+                  <span class="c-paren">→ It was, that을 지우면 Trust, not talent, held the team together. (완전한 문장 ✔)</span></p>
+              </div>
+            </li>
           </ol>
         </div>
       </div>
       <div class="c-item">
         <div class="c-head en">this / that</div>
         <div class="c-key">주어로 쓰인 경우: 앞 문장 <u>전체 내용</u>을 가리킴</div>
+        <div class="c-desc">명사 하나가 아니라 <b>앞 문장이 말한 상황·사실 전체</b>를 받습니다. 그래서 this가 주어인 문장은 앞 문장 바로 뒤에 와야 해요.</div>
+        <div class="c-ex">
+          <p class="en"><span class="ref">Many students study late at night.</span> <b class="pt">This</b> lowers their concentration the next day.</p>
+          <p class="ko">많은 학생이 밤늦게 공부한다. 이것(밤늦게 공부하는 것)은 다음 날 집중력을 떨어뜨린다.</p>
+        </div>
       </div>
       <div class="c-item">
         <div class="c-head">한 번 언급된 명사 대신</div>
         <div class="en">one(s), that(those) …</div>
+        <div class="c-desc"><b class="en">one(s)</b>: 같은 종류의 다른 것 (a + 명사) / <b class="en">that(those)</b>: the + 앞 명사, 주로 <span class="en">that of ~</span> 형태로 비교할 때<br>
+          <span class="c-paren">※ it은 '바로 그것', one은 '같은 종류의 아무거나 하나'</span></div>
+        <div class="c-ex">
+          <p class="en">I lost <span class="ref">my umbrella</span>, so I bought a new <b class="pt">one</b>.</p>
+          <p class="ko">우산을 잃어버려서 새 우산을 하나 샀다. (잃어버린 바로 그 우산이 아님)</p>
+        </div>
+        <div class="c-ex">
+          <p class="en"><span class="ref">The climate</span> of Korea is milder than <b class="pt">that</b> of Russia.</p>
+          <p class="ko">한국의 기후는 러시아의 기후보다 온화하다. (that = the climate)</p>
+        </div>
       </div>
     </div>
 
@@ -309,11 +362,25 @@
           <div class="c-vs">vs</div>
           <div><div class="c-head en">a(n) N / Ns</div><div>첫 등장</div></div>
         </div>
+        <div class="c-desc">처음 소개할 때는 a(n)이나 복수형, 다시 말할 때는 the를 씁니다. 순서 문제에서 <b>the N이 있는 문단은 a N이 나온 문단보다 뒤</b>에 와요.</div>
+        <div class="c-ex">
+          <p class="en">A researcher gave children <span class="ref">a puzzle</span>. <b class="pt">The puzzle</b> was too difficult for most of them.</p>
+          <p class="ko">한 연구자가 아이들에게 퍼즐을 주었다. 그 퍼즐은 대부분의 아이에게 너무 어려웠다.</p>
+        </div>
         <div class="c-paren">※ 집단을 대표하는 경우는 예외</div>
+        <div class="c-ex">
+          <p class="en"><b>The tiger</b> is an endangered species.</p>
+          <p class="ko">호랑이는 멸종 위기종이다. (특정한 호랑이가 아니라 '호랑이라는 종' 전체 → 처음 나와도 the)</p>
+        </div>
       </div>
       <div class="c-item">
         <div class="c-head en">(the) N of (the) N</div>
         <div>뒤에 수식하는 내용이 있으면 <b>처음 등장하는 명사에도 the</b>를 쓸 수 있다.</div>
+        <div class="c-desc">of 이하가 무엇인지 정해 주기 때문이에요. 이런 the는 앞을 가리키는 게 아니니 <b>순서 단서로 쓰면 안 돼요</b>.</div>
+        <div class="c-ex">
+          <p class="en"><b>The history</b> <u>of medicine</u> shows how ideas about health have changed.</p>
+          <p class="ko">의학의 역사는 건강에 대한 생각이 어떻게 변해 왔는지 보여 준다. (첫 문장이어도 the)</p>
+        </div>
       </div>
     </div>
 
@@ -321,9 +388,25 @@
       <h3><span class="c-num">(3)</span> 한정사</h3>
       <div class="c-item">
         <div class="c-head en">such N / each N</div>
+        <div class="c-desc"><b class="en">such N</b>: 앞에서 설명한 '그런' N — 앞 문장의 구체적인 예들을 묶어서 받아요.<br>
+          <b class="en">each N</b>: 앞에 나온 여러 개 중 '각각의' N — 앞에 여러 개(복수)가 먼저 나와야 해요.</div>
+        <div class="c-ex">
+          <p class="en">Some people <span class="ref">skip breakfast</span> or <span class="ref">eat only fast food</span>. <b class="pt">Such habits</b> can harm their health.</p>
+          <p class="ko">어떤 사람들은 아침을 거르거나 패스트푸드만 먹는다. 그런 습관은 건강을 해칠 수 있다.</p>
+        </div>
+        <div class="c-ex">
+          <p class="en">The students were divided into <span class="ref">three groups</span>. <b class="pt">Each group</b> received different instructions.</p>
+          <p class="ko">학생들은 세 집단으로 나뉘었다. 각 집단은 서로 다른 지시를 받았다.</p>
+        </div>
       </div>
       <div class="c-item">
         <div class="c-head en">this(these) N / that(those) N</div>
+        <div class="c-desc">앞 내용을 한 단어로 <b>요약해서</b> 받는 경우가 많아요. (예: this problem, these findings, this approach)
+          N이 앞 내용을 어떻게 이름 붙였는지 보면 글의 흐름이 보여요.</div>
+        <div class="c-ex">
+          <p class="en"><span class="ref">People who exercised regularly slept better and felt less stressed.</span> <b class="pt">These findings</b> suggest that exercise improves mental health.</p>
+          <p class="ko">규칙적으로 운동한 사람들은 더 잘 자고 스트레스를 덜 느꼈다. 이러한 결과는 운동이 정신 건강을 좋게 한다는 것을 보여 준다.</p>
+        </div>
       </div>
     </div>
   </section>
