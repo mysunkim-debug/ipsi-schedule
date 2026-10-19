@@ -211,6 +211,8 @@
   .c-imp { display: inline-block; font-size: 13px; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 1px; }
   .c-pair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
   .c-vs { color: var(--muted); font-size: 14px; }
+  header h1 .by { font-size: 13px; font-weight: normal; font-style: italic; color: var(--primary); margin-left: 2px; letter-spacing: .2px; }
+  .copy { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 18px; }
   .foot { text-align: center; color: var(--muted); font-size: 13px; margin-top: 30px; }
   .foot button { font-size: 13px; }
   @media (max-width: 560px) {
@@ -227,7 +229,7 @@
 <body>
 <header>
   <div class="head-in">
-    <h1>📘 수능 영어 어휘 <small>고빈출 400 + 27. 6/9모 + 개념</small></h1>
+    <h1>📘 수능 영어 어휘 <span class="by">by Sunny</span> <small>고빈출 400 + 27. 6/9모 + 개념</small></h1>
     <nav class="tabs" role="tablist">
       <button data-tab="list" class="on">단어장</button>
       <button data-tab="card">카드</button>
@@ -417,6 +419,7 @@
     학습 기록은 이 기기의 브라우저에만 저장됩니다. ·
     <button class="small" id="resetBtn">이 범위 기록 지우기</button>
   </div>
+  <div class="copy">© 2026 Sunny · 무단 복제·배포 금지</div>
 </main>
 
 <script>
