@@ -162,7 +162,7 @@
 <body>
 <header>
   <div class="head-in">
-    <h1>📘 수능 영어 어휘 <small>고빈출 400 + 27. 6·9모</small></h1>
+    <h1>📘 수능 영어 어휘 <small>고빈출 400 + 27. 6/9모</small></h1>
     <nav class="tabs" role="tablist">
       <button data-tab="list" class="on">단어장</button>
       <button data-tab="card">카드</button>
@@ -656,10 +656,10 @@ const MO = [
 ["공통","형용사류","complex","복잡한","","[6모] 30번 — Scripts with complex language\n[9모] 23번 — solve complex problems"],
 ["공통","형용사류","significant","중요한; 상당한; 유의미한","","[6모] 30번 — a significant emphasis\n[9모] 20, 32번 — significant changes / adaptive significance"],
 
-["다의어","6·9모 공통","navigate","헤쳐나가다, 길을 찾다","기본 의미: (배·비행기가) 이동하다","[9모] 20번: \"navigate this changing world\""],
-["다의어","6·9모 공통","sustain","(부상을) 입다, 당하다","기본 의미: 유지하다, 지탱하다","[6모] 35번: \"the injuries they sustain\""],
-["다의어","6·9모 공통","performance","수행 능력, 성과, 실적","기본 의미: 공연, 연주","[6모] 20번 / [9모] 36번: multidimensional performance"],
-["다의어","6·9모 공통","investment","감정적 투입, 헌신","기본 의미: (금전적) 투자","[6모] 33번: \"the emotional investment\""],
+["다의어","6/9모 공통","navigate","헤쳐나가다, 길을 찾다","기본 의미: (배·비행기가) 이동하다","[9모] 20번: \"navigate this changing world\""],
+["다의어","6/9모 공통","sustain","(부상을) 입다, 당하다","기본 의미: 유지하다, 지탱하다","[6모] 35번: \"the injuries they sustain\""],
+["다의어","6/9모 공통","performance","수행 능력, 성과, 실적","기본 의미: 공연, 연주","[6모] 20번 / [9모] 36번: multidimensional performance"],
+["다의어","6/9모 공통","investment","감정적 투입, 헌신","기본 의미: (금전적) 투자","[6모] 33번: \"the emotional investment\""],
 ["다의어","9모 단독","mine (동사)","데이터를 채굴·추출하다","기본 의미: 광산을 채굴하다","[9모] 21번: \"platforms are mining for similarities\""],
 ["다의어","9모 단독","fire (동사)","(신경을) 활성화시키다","기본 의미: 불을 피우다 / 총을 쏘다","[9모] 31번: \"your brain fires up the stress system\""],
 ["다의어","9모 단독","label (동사)","~라고 명명하다","기본 의미: 라벨을 붙이다","[9모] 23번: \"loves to label dopamine as the pleasure molecule\""],
@@ -792,13 +792,13 @@ for (let d = 0; d < 8; d++) {
   const a = d * 50 + 1, b = a + 49;
   RANGES.push({ key: 'jl' + (d + 1), label: `고빈출 400 — Day ${d + 1} (${a}~${b})`, ids: () => WORDS.filter(x => x.deck === 'jl' && x.no >= a && x.no <= b) });
 }
-RANGES.push({ key: 'mo', label: '6·9모 어휘 — 전체', ids: () => WORDS.filter(x => x.deck === 'mo') });
-[['공통', '6·9모 — ① 공통 단어'], ['다의어', '6·9모 — ② 다의어'], ['관용어구', '6·9모 — ③ 관용어구'],
- ['연결어', '6·9모 — ④ 연결어·접속부사'], ['주석', '6·9모 — ⑤ 주석 단어']].forEach(([c, label]) =>
+RANGES.push({ key: 'mo', label: '6/9모 어휘 — 전체', ids: () => WORDS.filter(x => x.deck === 'mo') });
+[['공통', '6/9모 — ① 공통 단어'], ['다의어', '6/9모 — ② 다의어'], ['관용어구', '6/9모 — ③ 관용어구'],
+ ['연결어', '6/9모 — ④ 연결어·접속부사'], ['주석', '6/9모 — ⑤ 주석 단어']].forEach(([c, label]) =>
   RANGES.push({ key: 'mo-' + c, label, ids: () => WORDS.filter(x => x.deck === 'mo' && x.cat === c) }));
 RANGES.push({ key: 'star', label: '★ 별표한 단어', ids: () => WORDS.filter(x => st(x).star) });
 RANGES.push({ key: 'wrong', label: '✗ 퀴즈에서 틀린 단어', ids: () => WORDS.filter(x => st(x).wrong > 0) });
-RANGES.push({ key: 'all', label: '전체 단어 (고빈출 + 6·9모)', ids: () => WORDS });
+RANGES.push({ key: 'all', label: '전체 단어 (고빈출 + 6/9모)', ids: () => WORDS });
 
 // ---------- 저장 ----------
 const KEY = 'suneung-vocab-v1';
@@ -990,7 +990,7 @@ function startQuiz() {
   renderQuestion();
 }
 function distractors(x) {
-  // 같은 묶음(고빈출 / 같은 6·9모 분류)에서 우선 고르고, 모자라면 전체에서
+  // 같은 묶음(고빈출 / 같은 6/9모 분류)에서 우선 고르고, 모자라면 전체에서
   const key = w => shortMeaning(w);
   const same = WORDS.filter(w => w !== x && (x.deck === 'jl' ? w.deck === 'jl' : w.cat === x.cat));
   const out = [], seen = new Set([key(x), x.w]);
