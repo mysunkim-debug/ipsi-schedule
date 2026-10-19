@@ -221,6 +221,9 @@
   .c-imp { display: inline-block; font-size: 13px; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 1px; }
   .c-pair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
   .c-pair .c-head { margin-bottom: 2px; }
+  /* 비교 대상(지시어 아님)은 연하게 */
+  .c-head-sub { background: transparent; color: color-mix(in srgb, var(--primary) 75%, var(--muted)); border: 1.5px dashed color-mix(in srgb, var(--primary) 45%, transparent); padding: 1.5px 9.5px; font-weight: 600; }
+  .c-sub-label { color: var(--muted); }
   .c-vs { color: var(--muted); font-size: 14px; }
   header h1 .by { font-size: 13px; font-weight: normal; font-style: italic; color: var(--primary); margin-left: 2px; letter-spacing: .2px; }
   .nocopy { display: inline-block; font-size: 11px; line-height: 16px; padding: 0 6px; margin-left: 4px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); white-space: nowrap; vertical-align: 1px; }
@@ -400,7 +403,7 @@
       <h3><span class="c-num">(3)</span> 정관사 <span class="en">the</span></h3>
       <div class="c-item">
         <div class="c-pair">
-          <div><div class="c-head en">a(n) N / Ns</div><div>첫 등장</div></div>
+          <div><div class="c-head c-head-sub en">a(n) N / Ns</div><div class="c-sub-label">첫 등장</div></div>
           <div class="c-vs">vs</div>
           <div><div class="c-head en">the N</div><div>재등장</div></div>
         </div>
