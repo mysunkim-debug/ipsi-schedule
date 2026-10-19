@@ -180,6 +180,26 @@
   .wrong-list { margin-top: 14px; }
   .wrong-list div { padding: 8px 0; border-bottom: 1px solid var(--line); }
 
+  /* 개념 */
+  .concept { margin-top: 4px; }
+  .concept h2 { font-size: 24px; margin: 6px 2px 12px; }
+  .c-sec { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .c-sec h3 { margin: 0 0 10px; font-size: 19px; color: var(--primary); }
+  .c-num { color: var(--muted); font-weight: normal; margin-right: 2px; }
+  .c-item { padding: 10px 0; border-top: 1px dashed var(--line); }
+  .c-sec h3 + .c-item { border-top: 0; padding-top: 0; }
+  .c-head { font-weight: bold; font-size: 18px; margin-bottom: 4px; }
+  .c-box { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-top: 6px; }
+  .c-box-title { font-weight: bold; font-size: 15px; color: var(--muted); margin-bottom: 4px; }
+  .c-list { margin: 0; padding-left: 22px; }
+  .c-list li { margin: 3px 0; }
+  .c-paren { color: var(--muted); font-size: 15px; }
+  .c-key { font-weight: bold; background: linear-gradient(transparent 60%, color-mix(in srgb, var(--star) 35%, transparent) 60%); display: inline; }
+  .c-list li.c-key { display: list-item; background: none; }
+  .c-list li.c-key > .en { background: linear-gradient(transparent 60%, color-mix(in srgb, var(--star) 35%, transparent) 60%); }
+  .c-imp { display: inline-block; font-size: 13px; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 1px; }
+  .c-pair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
+  .c-vs { color: var(--muted); font-size: 14px; }
   .foot { text-align: center; color: var(--muted); font-size: 13px; margin-top: 30px; }
   .foot button { font-size: 13px; }
   @media (max-width: 560px) {
@@ -201,6 +221,7 @@
       <button data-tab="list" class="on">단어장</button>
       <button data-tab="card">카드</button>
       <button data-tab="quiz">퀴즈</button>
+      <button data-tab="concept">개념</button>
     </nav>
     <button class="theme-btn" id="themeBtn" title="배경색 바꾸기" aria-label="배경색 바꾸기" aria-expanded="false">🎨</button>
     <div class="theme-pop" id="themePop" hidden></div>
@@ -208,7 +229,7 @@
 </header>
 
 <main>
-  <div class="panel">
+  <div class="panel" id="rangePanel">
     <div class="range-row">
       <label for="range">학습 범위</label>
       <select id="range"></select>
@@ -253,7 +274,61 @@
     <div id="quizArea" style="margin-top:14px"></div>
   </section>
 
-  <div class="foot">
+  <!-- 개념 -->
+  <section id="tab-concept" class="concept" hidden>
+    <h2>1. 지시어</h2>
+
+    <div class="c-sec">
+      <h3><span class="c-num">(1)</span> 대명사</h3>
+      <div class="c-item">
+        <div class="c-head en">it, he, she / they</div>
+        <div class="c-box">
+          <div class="c-box-title">It이 주어로 쓰였을 때</div>
+          <ol class="c-list">
+            <li>대명사 <span class="c-paren">(앞 문장 주어 가리킴)</span></li>
+            <li>가주어 / 진주어</li>
+            <li class="c-key"><span class="en">It ~ that</span> 강조구문 <span class="c-imp">중요한 문장!!!</span></li>
+          </ol>
+        </div>
+      </div>
+      <div class="c-item">
+        <div class="c-head en">this / that</div>
+        <div class="c-key">주어로 쓰인 경우: 앞 문장 <u>전체 내용</u>을 가리킴</div>
+      </div>
+      <div class="c-item">
+        <div class="c-head">한 번 언급된 명사 대신</div>
+        <div class="en">one(s), that(those) …</div>
+      </div>
+    </div>
+
+    <div class="c-sec">
+      <h3><span class="c-num">(2)</span> 정관사</h3>
+      <div class="c-item">
+        <div class="c-pair">
+          <div><div class="c-head en">the N</div><div>재등장</div></div>
+          <div class="c-vs">vs</div>
+          <div><div class="c-head en">a(n) N / Ns</div><div>첫 등장</div></div>
+        </div>
+        <div class="c-paren">※ 집단을 대표하는 경우는 예외</div>
+      </div>
+      <div class="c-item">
+        <div class="c-head en">(the) N of (the) N</div>
+        <div>뒤에 수식하는 내용이 있으면 <b>처음 등장하는 명사에도 the</b>를 쓸 수 있다.</div>
+      </div>
+    </div>
+
+    <div class="c-sec">
+      <h3><span class="c-num">(3)</span> 한정사</h3>
+      <div class="c-item">
+        <div class="c-head en">such N / each N</div>
+      </div>
+      <div class="c-item">
+        <div class="c-head en">this(these) N / that(those) N</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot" id="foot">
     학습 기록은 이 기기의 브라우저에만 저장됩니다. ·
     <button class="small" id="resetBtn">이 범위 기록 지우기</button>
   </div>
@@ -1091,7 +1166,9 @@ function renderResult() {
 function switchTab(t) {
   S.tab = t; save();
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  ['list', 'card', 'quiz'].forEach(k => $('#tab-' + k).hidden = k !== t);
+  ['list', 'card', 'quiz', 'concept'].forEach(k => $('#tab-' + k).hidden = k !== t);
+  // 개념 탭에는 학습 범위·기록이 필요 없음
+  $('#rangePanel').hidden = $('#foot').hidden = t === 'concept';
   if (t === 'card') { buildDeck(true); renderCard(); }
   if (t === 'quiz') { quiz = null; renderQuizSetup(); }
   if (t === 'list') renderList();
