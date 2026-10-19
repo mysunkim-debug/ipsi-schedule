@@ -191,7 +191,9 @@
   .c-head { font-weight: bold; font-size: 18px; margin-bottom: 4px; }
   .c-box { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-top: 6px; }
   .c-box-title { font-weight: bold; font-size: 15px; color: var(--muted); margin-bottom: 4px; }
-  .c-list { margin: 0; padding-left: 22px; }
+  .c-list { margin: 0; padding-left: 0; list-style: none; }
+  .c-list > li { position: relative; padding-left: 26px; }
+  .c-list > li > .c-no { position: absolute; left: 0; top: -2px; font-size: 1.25em; line-height: 1.4; color: var(--primary); }
   .c-list li { margin: 3px 0; }
   .c-paren { color: var(--muted); font-size: 15px; }
   .c-key { font-weight: bold; background: linear-gradient(transparent 60%, color-mix(in srgb, var(--star) 35%, transparent) 60%); display: inline; }
@@ -304,20 +306,20 @@
         <div class="c-box">
           <div class="c-box-title">It이 주어로 쓰였을 때</div>
           <ol class="c-list">
-            <li>대명사 <span class="c-paren">(앞 문장 주어 가리킴)</span>
+            <li><span class="c-no">①</span>대명사 <span class="c-paren">(앞 문장 주어 가리킴)</span>
               <div class="c-ex">
                 <p class="en"><span class="ref">The experiment</span> failed. <b class="pt">It</b> was poorly designed.</p>
                 <p class="ko">그 실험은 실패했다. 그것(실험)은 설계가 허술했다.</p>
               </div>
             </li>
-            <li>가주어 / 진주어
+            <li><span class="c-no">②</span>가주어 / 진주어
               <div class="c-desc">주어가 길 때 It을 앞에 두고, 진짜 주어(to부정사·that절)는 뒤로 보냅니다. 이때 It은 <b>아무것도 가리키지 않아요</b>.</div>
               <div class="c-ex">
                 <p class="en"><b>It</b> is important <u>to get enough sleep before an exam</u>.</p>
                 <p class="ko">시험 전에 충분히 자는 것이 중요하다. (It = 가주어, 밑줄 = 진주어)</p>
               </div>
             </li>
-            <li><span class="c-key"><span class="en">It ~ that</span> 강조구문</span> <span class="c-imp">중요한 문장!!!</span>
+            <li><span class="c-no">③</span><span class="c-key"><span class="en">It ~ that</span> 강조구문</span> <span class="c-imp">중요한 문장!!!</span>
               <div class="c-desc">It is/was와 that 사이에 강조하고 싶은 말을 넣습니다. 필자가 힘주어 말하는 부분이라 <b>주제문·요지의 단서</b>가 돼요.<br>
                 구별법: <b>It is/was와 that을 지워도 완전한 문장</b>이 남으면 강조구문, 안 되면 가주어 구문.</div>
               <div class="c-ex">
