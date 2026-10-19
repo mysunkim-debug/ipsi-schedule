@@ -184,6 +184,9 @@
   /* 개념 */
   .concept { margin-top: 4px; }
   .concept h2 { font-size: 24px; margin: 6px 2px 12px; }
+  .c-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .c-title-row button { font-size: 15px; padding: 6px 12px; }
+  .print-only { display: none; }
   .c-sec { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
   .c-sec h3 { margin: 0 0 12px; font-size: 20px; color: var(--accent); padding-bottom: 6px; border-bottom: 2px solid color-mix(in srgb, var(--accent) 30%, transparent); }
   .c-num { color: var(--accent); margin-right: 2px; }
@@ -242,6 +245,27 @@
     .word { grid-template-columns: 30px 1fr auto; padding: 9px 10px; }
     .face .big { font-size: 32px; }
     .flash { height: 260px; }
+  }
+
+  @media print {
+    :root, :root[data-theme] {
+      --bg: #ffffff; --card: #ffffff; --text: #1d2330; --muted: #5b6270; --line: #d5dae2;
+      --primary: #2f6fed; --primary-soft: #eaf1ff; --good: #1f8a52; --bad: #d64545; --bad-soft: #fdeaea;
+      --star: #f0a020; --accent: #8a4fd6; --ko: #8a5a2b; --shadow: none;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: #fff; font-size: 11pt; }
+    header, #rangePanel, #foot, #printBtn, .theme-pop, #tab-list, #tab-card, #tab-quiz { display: none !important; }
+    #tab-concept { display: block !important; }
+    main { max-width: none; margin: 0; padding: 0; }
+    .print-only { display: block; }
+    .print-head { font-size: 10pt; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 8px; }
+    .print-head span { float: right; }
+    .c-sec { border: 0; padding: 0; margin-bottom: 14px; }
+    /* 큰 상자는 페이지에서 나뉘어도 되고, 예문 하나·제목은 붙여 둠 */
+    .c-ex, .c-tip, .c-head-row, .c-pair { break-inside: avoid; }
+    .c-sec h3, .c-head, .c-box-title { break-after: avoid; }
+    .copy { margin-top: 10px; }
   }
 </style>
 </head>
@@ -308,7 +332,11 @@
 
   <!-- 개념 -->
   <section id="tab-concept" class="concept" hidden>
-    <h2>1. 지시어</h2>
+    <div class="print-only print-head">📘 수능 영어 어휘 <i>by Sunny</i> · 개념 정리 <span>무단 복제·배포 금지</span></div>
+    <div class="c-title-row">
+      <h2>1. 지시어</h2>
+      <button id="printBtn" title="개념 인쇄하기">🖨️ 인쇄</button>
+    </div>
     <div class="c-tip">
       <b>💡 왜 중요할까?</b> 지시어는 앞에 나온 내용을 가리키므로, <b>바로 앞에 가리키는 대상이 있어야</b> 글이 자연스럽게 이어집니다.
       순서 배열·문장 삽입 문제에서 지시어가 무엇을 가리키는지 찾으면 앞뒤 문장이 결정돼요.
@@ -1318,6 +1346,7 @@ function applyTheme() {
   $('#themePop').innerHTML = THEMES.map(([k, name, color]) =>
     `<button data-k="${k}" class="${S.theme === k ? 'on' : ''}"><span class="dot" style="background:${color}"></span>${name}</button>`).join('');
 }
+$('#printBtn').addEventListener('click', () => window.print());
 $('#themeBtn').addEventListener('click', e => {
   e.stopPropagation();
   const pop = $('#themePop'); pop.hidden = !pop.hidden;
