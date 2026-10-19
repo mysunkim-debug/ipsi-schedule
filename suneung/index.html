@@ -27,6 +27,7 @@
     --accent-soft: #f2eafd;
     --shadow: 0 2px 8px rgba(20,30,50,.06);
     --pos-동: #2f6fed; --pos-명: #2f8f5b; --pos-형: #c2410c; --pos-부: #7a4fd6; --pos-전: #0e7c86; --pos-숙어: #b8327a;
+    --ko: #8a5a2b;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
@@ -34,7 +35,7 @@
       --primary: #5b8cff; --primary-dark: #7aa2ff; --primary-soft: #1f2b46;
       --good: #4cc488; --good-soft: #17322a; --bad: #ff7a7a; --bad-soft: #3a1f22;
       --accent: #b48cf2; --accent-soft: #2c2340; --shadow: none;
-      --pos-동: #7aa2ff; --pos-명: #5ccf8f; --pos-형: #ff9a5c; --pos-부: #b894f5; --pos-전: #4fc6cf; --pos-숙어: #f07ab6;
+      --pos-동: #7aa2ff; --pos-명: #5ccf8f; --pos-형: #ff9a5c; --pos-부: #b894f5; --pos-전: #4fc6cf; --pos-숙어: #f07ab6; --ko: #e0b07e;
     }
   }
   :root[data-theme="dark"] {
@@ -42,7 +43,7 @@
     --primary: #5b8cff; --primary-dark: #7aa2ff; --primary-soft: #1f2b46;
     --good: #4cc488; --good-soft: #17322a; --bad: #ff7a7a; --bad-soft: #3a1f22;
     --accent: #b48cf2; --accent-soft: #2c2340; --shadow: none;
-    --pos-동: #7aa2ff; --pos-명: #5ccf8f; --pos-형: #ff9a5c; --pos-부: #b894f5; --pos-전: #4fc6cf; --pos-숙어: #f07ab6;
+    --pos-동: #7aa2ff; --pos-명: #5ccf8f; --pos-형: #ff9a5c; --pos-부: #b894f5; --pos-전: #4fc6cf; --pos-숙어: #f07ab6; --ko: #e0b07e;
   }
   /* 배경색 테마 (🎨 버튼) */
   :root[data-theme="cream"] { --bg: #f5efe2; --line: #e6dcc8; --primary-soft: #f3ead6; }
@@ -186,10 +187,18 @@
   .c-sec { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
   .c-sec h3 { margin: 0 0 10px; font-size: 19px; color: var(--primary); }
   .c-num { color: var(--muted); font-weight: normal; margin-right: 2px; }
-  .c-item { padding: 10px 0; border-top: 1px dashed var(--line); }
-  .c-sec h3 + .c-item { border-top: 0; padding-top: 0; }
-  .c-head { font-weight: bold; font-size: 18px; margin-bottom: 4px; }
-  .c-box { background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-top: 6px; }
+  .c-item {
+    background: color-mix(in srgb, var(--primary) 5%, var(--card));
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--line));
+    border-left: 4px solid var(--primary);
+    border-radius: 10px; padding: 12px 14px; margin-top: 12px;
+  }
+  .c-sec h3 + .c-item { margin-top: 0; }
+  .c-head {
+    display: inline-block; font-weight: bold; font-size: 17px; line-height: 1.4;
+    background: var(--primary); color: #fff; border-radius: 7px; padding: 3px 11px; margin-bottom: 8px;
+  }
+  .c-box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
   .c-box-title { font-weight: bold; font-size: 15px; color: var(--muted); margin-bottom: 4px; }
   .c-list { margin: 0; padding-left: 0; list-style: none; }
   .c-list > li { position: relative; padding-left: 26px; }
@@ -205,11 +214,13 @@
   .c-ex::before { content: "예"; display: inline-block; font-size: 12px; font-weight: bold; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-bottom: 2px; }
   .c-ex p { margin: 2px 0; }
   .c-ex p.en { font-size: 16.5px; }
-  .c-ex p.ko { font-size: 14.5px; color: var(--muted); }
+  .c-ex p.ko { font-size: 14.5px; color: var(--ko); }
+  .c-ex p.ko .c-paren { color: var(--muted); }
   .pt { color: var(--primary); font-weight: bold; }
   .ref { text-decoration: underline wavy color-mix(in srgb, var(--good) 70%, transparent); text-underline-offset: 4px; color: var(--good); }
   .c-imp { display: inline-block; font-size: 13px; color: var(--bad); background: var(--bad-soft); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 1px; }
   .c-pair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
+  .c-pair .c-head { margin-bottom: 2px; }
   .c-vs { color: var(--muted); font-size: 14px; }
   header h1 .by { font-size: 13px; font-weight: normal; font-style: italic; color: var(--primary); margin-left: 2px; letter-spacing: .2px; }
   .nocopy { display: inline-block; font-size: 11px; line-height: 16px; padding: 0 6px; margin-left: 4px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); white-space: nowrap; vertical-align: 1px; }
